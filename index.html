@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Harvest Surf Card</title>
+
+<style>
+body {
+    margin: 0;
+    background: #f2f2f2;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111;
+}
+
+.card {
+    max-width: 500px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,.15);
+}
+
+.header {
+    background: #111;
+    color: white;
+    padding: 22px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.header p {
+    margin: 6px 0 0;
+    opacity: .75;
+}
+
+.section {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.section h2 {
+    margin: 0 0 15px;
+    font-size: 19px;
+}
+
+.big {
+    font-size: 42px;
+    font-weight: bold;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 17px;
+}
+
+.label {
+    color: #666;
+}
+
+.tide {
+    background: #f6f6f6;
+    padding: 12px;
+    margin: 7px 0;
+    border-radius: 10px;
+}
+
+.footer {
+    padding: 15px 20px;
+    font-size: 13px;
+    color: #777;
+}
+
+.loading {
+    color: #777;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <div class="header">
+        <h1>HARVEST / CAMPUS POINT</h1>
+        <p id="date">Loading date...</p>
+    </div>
+
+    <div class="section">
+        <h2>🌊 HARVEST BUOY</h2>
+
+        <div id="buoy" class="loading">
+            Loading live buoy data...
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🌡️ CAMPUS POINT</h2>
+
+        <div class="row">
+            <span class="label">Water temperature</span>
+            <strong id="waterTemp">Loading...</strong>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🌊 TODAY'S TIDES</h2>
+
+        <div id="tides">
+            Loading tides...
+        </div>
+    </div>
+
+    <div class="footer">
+        Live data • Updated automatically<br>
+        Harvest buoy data: CDIP<br>
+        Tide data: NOAA
+    </div>
+
+</div>
+
+<script>
+
+const today = new Date();
+
+document.getElementById("date").innerText =
+    today.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+    });
+
+/*
+----------------------------------------------------
+HARVEST BUOY
+CDIP station 071 = HARVEST, CA
+----------------------------------------------------
+*/
+
+async function loadHarvest() {
+
+    try {
+
+        /*
+        CDIP realtime parameter data.
+        */
+
+        const url =
+        "https://cdip.ucsd.edu/data_access/rtp/071p1_rt.txt";
+
+        const response = await fetch(url);
+
+        if (!response.ok)
+            throw new Error("Buoy unavailable");
+
+        const text = await response.text();
+
+        const lines = text.trim().split("\n");
+
+        /*
+        Find the most recent usable data row.
+        */
+
+        let row = null;
+
+        for (let i = lines.length - 1; i >= 0; i--) {
+
+            const parts = lines[i].trim().split(/\s+/);
+
+            if (parts.length >= 8 && !isNaN(parseFloat(parts[5]))) {
+                row = parts;
+                break;
+            }
+        }
+
+        if (!row)
+            throw new Error("No buoy data");
+
+        /*
+        CDIP fields:
+        date/time
+        Hs
+        Tp
+        ...
+        */
+
+        const hsMeters = parseFloat(row[5]);
+        const period = parseFloat(row[6]);
+
+        const feet = hsMeters * 3.28084;
+
+        document.getElementById("buoy").innerHTML = `
+
+            <div class="big">
+                ${feet.toFixed(1)} ft
+            </div>
+
+            <div class="row">
+                <span class="label">Period</span>
+                <strong>${period.toFixed(0)} sec</strong>
+            </div>
+
+            <div class="row">
+                <span class="label">Station</span>
+                <strong>Harvest 071</strong>
+            </div>
+
+        `;
+
+    } catch (error) {
+
+        document.getElementById("buoy").innerHTML =
+            "Buoy data temporarily unavailable.<br><br>" +
+            "Open 17ft for the live Harvest reading.";
+
+    }
+}
+
+
+/*
+----------------------------------------------------
+NOAA TIDES
+Santa Barbara station
+----------------------------------------------------
+*/
+
+async function loadTides() {
+
+    try {
+
+        const year = today.getFullYear();
+        const month = String(today.getMonth()+1).padStart(2,"0");
+        const day = String(today.getDate()).padStart(2,"0");
+
+        const begin =
+            `${year}${month}${day}`;
+
+        const url =
+        `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=harvestsurf&begin_date=${begin}&end_date=${begin}&datum=MLLW&station=9411340&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+
+        const response = await fetch(url);
+
+        const data = await response.json();
+
+        if (!data.predictions)
+            throw new Error("No tide data");
+
+        let html = "";
+
+        data.predictions.forEach(tide => {
+
+            const type =
+                tide.type === "H"
+                ? "HIGH"
+                : "LOW";
+
+            html += `
+                <div class="tide">
+                    <strong>${type}</strong>
+                    &nbsp; ${tide.t} 
+                    <span style="float:right">
+                        ${parseFloat(tide.v).toFixed(1)} ft
+                    </span>
+                </div>
+            `;
+        });
+
+        document.getElementById("tides").innerHTML = html;
+
+    } catch(error) {
+
+        document.getElementById("tides").innerHTML =
+            "Tide data temporarily unavailable.";
+
+    }
+}
+
+
+/*
+----------------------------------------------------
+WATER TEMPERATURE
+----------------------------------------------------
+Placeholder until we connect the correct
+Campus Point station.
+*/
+
+document.getElementById("waterTemp").innerText =
+    "Connecting...";
+
+
+loadHarvest();
+loadTides();
+
+</script>
+
+</body>
+</html>
