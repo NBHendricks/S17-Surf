@@ -1,6 +1,8 @@
 import json
+import os
 import urllib.request
 import urllib.parse
+
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -9,6 +11,7 @@ PACIFIC = ZoneInfo("America/Los_Angeles")
 
 
 def download_text(url):
+
     request = urllib.request.Request(
         url,
         headers={
@@ -28,10 +31,6 @@ def download_text(url):
 
 
 def parse_ndbc(station):
-    """
-    Download the latest standard meteorological
-    observation from an NDBC station.
-    """
 
     url = (
         "https://www.ndbc.noaa.gov/"
@@ -60,11 +59,9 @@ def parse_ndbc(station):
         if len(values) < len(headers):
             continue
 
-        row = dict(
+        return dict(
             zip(headers, values)
         )
-
-        return row
 
     raise RuntimeError(
         f"No valid row for {station}"
@@ -72,10 +69,6 @@ def parse_ndbc(station):
 
 
 def number(value):
-    """
-    Convert an NDBC field to float while
-    rejecting missing-data values.
-    """
 
     if value is None:
         return None
@@ -91,6 +84,7 @@ def number(value):
 
     try:
         return float(value)
+
     except ValueError:
         return None
 
@@ -111,13 +105,12 @@ def harvest_data():
         row.get("MWD")
     )
 
-    water_c = number(
-        row.get("WTMP")
-    )
-
     return {
         "wave_height_ft":
-            round(wave_m * 3.28084, 1)
+            round(
+                wave_m * 3.28084,
+                1
+            )
             if wave_m is not None
             else None,
 
@@ -125,15 +118,7 @@ def harvest_data():
             period,
 
         "direction_deg":
-            direction,
-
-        "buoy_temp_f":
-            round(
-                water_c * 9 / 5 + 32,
-                1
-            )
-            if water_c is not None
-            else None
+            direction
     }
 
 
@@ -147,6 +132,7 @@ def campus_water_temp():
 
     return {
         "station": "46053",
+
         "temp_f":
             round(
                 water_c * 9 / 5 + 32,
@@ -182,9 +168,9 @@ def tide_data(today):
         + urllib.parse.urlencode(params)
     )
 
-    text = download_text(url)
-
-    result = json.loads(text)
+    result = json.loads(
+        download_text(url)
+    )
 
     predictions = result.get(
         "predictions",
@@ -221,9 +207,111 @@ def tide_data(today):
     return tides
 
 
+def campus_live_cam():
+
+    api_key = os.environ.get(
+        "YOUTUBE_API_KEY"
+    )
+
+    if not api_key:
+        print("No YouTube API key available")
+        return None
+
+    params = {
+        "part": "snippet",
+        "q": "Campus Point Surf Cam GRIT",
+        "type": "video",
+        "eventType": "live",
+        "maxResults": "5",
+        "videoEmbeddable": "true",
+        "key": api_key
+    }
+
+    url = (
+        "https://www.googleapis.com/"
+        "youtube/v3/search?"
+        + urllib.parse.urlencode(params)
+    )
+
+    data = json.loads(
+        download_text(url)
+    )
+
+    items = data.get(
+        "items",
+        []
+    )
+
+    for item in items:
+
+        snippet = item.get(
+            "snippet",
+            {}
+        )
+
+        title = snippet.get(
+            "title",
+            ""
+        ).lower()
+
+        channel = snippet.get(
+            "channelTitle",
+            ""
+        ).lower()
+
+        video_id = (
+            item
+            .get("id", {})
+            .get("videoId")
+        )
+
+        if (
+            video_id
+            and
+            "campus point" in title
+            and
+            "grit" in channel
+        ):
+
+            return {
+                "video_id": video_id,
+                "title": snippet.get("title"),
+                "channel": snippet.get(
+                    "channelTitle"
+                )
+            }
+
+    for item in items:
+
+        video_id = (
+            item
+            .get("id", {})
+            .get("videoId")
+        )
+
+        if video_id:
+
+            snippet = item.get(
+                "snippet",
+                {}
+            )
+
+            return {
+                "video_id": video_id,
+                "title": snippet.get("title"),
+                "channel": snippet.get(
+                    "channelTitle"
+                )
+            }
+
+    return None
+
+
 def main():
 
-    now = datetime.now(PACIFIC)
+    now = datetime.now(
+        PACIFIC
+    )
 
     data = {
         "date_display":
@@ -238,9 +326,9 @@ def main():
 
         "harvest": None,
         "water_temp": None,
-        "tides": []
+        "tides": [],
+        "campus_cam": None
     }
-
 
     try:
         data["harvest"] = (
@@ -253,7 +341,6 @@ def main():
             error
         )
 
-
     try:
         data["water_temp"] = (
             campus_water_temp()
@@ -264,7 +351,6 @@ def main():
             "Water temp error:",
             error
         )
-
 
     try:
         data["tides"] = (
@@ -277,6 +363,16 @@ def main():
             error
         )
 
+    try:
+        data["campus_cam"] = (
+            campus_live_cam()
+        )
+
+    except Exception as error:
+        print(
+            "Campus cam error:",
+            error
+        )
 
     with open(
         "data.json",
@@ -289,7 +385,6 @@ def main():
             file,
             indent=2
         )
-
 
     print(
         json.dumps(
