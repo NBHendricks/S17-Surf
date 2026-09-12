@@ -11,7 +11,6 @@ permissions:
   contents: write
 
 jobs:
-
   update:
 
     runs-on: ubuntu-latest
@@ -27,6 +26,8 @@ jobs:
           python-version: "3.12"
 
       - name: Update surf data
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python update_data.py
 
       - name: Save updated data
