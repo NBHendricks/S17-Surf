@@ -4,60 +4,75 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Harvest Surf Card</title>
+<title>Harvest / Campus Point Surf Card</title>
 
 <style>
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    background: #f2f2f2;
+    padding: 16px;
+    background: #eeeeee;
     font-family: Arial, Helvetica, sans-serif;
     color: #111;
 }
 
 .card {
     max-width: 500px;
-    margin: 20px auto;
+    margin: 0 auto;
     background: white;
     border-radius: 18px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,0,0,.15);
 }
 
+/* HEADER */
+
 .header {
     background: #111;
     color: white;
-    padding: 22px;
+    padding: 24px 20px;
 }
 
 .header h1 {
     margin: 0;
-    font-size: 28px;
+    font-size: 27px;
+    letter-spacing: .5px;
 }
 
 .header p {
-    margin: 6px 0 0;
+    margin: 7px 0 0;
     opacity: .75;
+    font-size: 15px;
 }
 
+/* SECTIONS */
+
 .section {
-    padding: 20px;
+    padding: 21px 20px;
     border-bottom: 1px solid #ddd;
 }
 
 .section h2 {
-    margin: 0 0 15px;
+    margin: 0 0 16px;
     font-size: 19px;
 }
 
 .big {
-    font-size: 42px;
+    font-size: 44px;
     font-weight: bold;
+    margin-bottom: 8px;
 }
 
 .row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 8px 0;
+    gap: 15px;
     font-size: 17px;
 }
 
@@ -65,22 +80,69 @@ body {
     color: #666;
 }
 
-.tide {
-    background: #f6f6f6;
-    padding: 12px;
-    margin: 7px 0;
-    border-radius: 10px;
-}
-
-.footer {
-    padding: 15px 20px;
-    font-size: 13px;
-    color: #777;
+.value {
+    font-weight: bold;
+    text-align: right;
 }
 
 .loading {
     color: #777;
 }
+
+/* WATER TEMP */
+
+.temp {
+    font-size: 42px;
+    font-weight: bold;
+    margin: 5px 0 10px;
+}
+
+.source {
+    color: #777;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* TIDES */
+
+.tide {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f4f4f4;
+    padding: 13px;
+    margin: 8px 0;
+    border-radius: 10px;
+}
+
+.tide-type {
+    font-weight: bold;
+}
+
+.tide-time {
+    color: #555;
+}
+
+.tide-height {
+    font-weight: bold;
+}
+
+/* FOOTER */
+
+.footer {
+    padding: 17px 20px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #777;
+    background: #fafafa;
+}
+
+.status {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #888;
+}
+
 </style>
 </head>
 
@@ -88,216 +150,596 @@ body {
 
 <div class="card">
 
+    <!-- HEADER -->
+
     <div class="header">
+
         <h1>HARVEST / CAMPUS POINT</h1>
-        <p id="date">Loading date...</p>
+
+        <p id="date">
+            Loading today's surf report...
+        </p>
+
     </div>
 
+
+    <!-- HARVEST BUOY -->
+
     <div class="section">
+
         <h2>🌊 HARVEST BUOY</h2>
 
         <div id="buoy" class="loading">
-            Loading live buoy data...
+            Loading live Harvest buoy data...
         </div>
+
     </div>
 
-    <div class="section">
-        <h2>🌡️ CAMPUS POINT</h2>
 
-        <div class="row">
-            <span class="label">Water temperature</span>
-            <strong id="waterTemp">Loading...</strong>
+    <!-- WATER TEMPERATURE -->
+
+    <div class="section">
+
+        <h2>🌡️ CAMPUS POINT AREA</h2>
+
+        <div
+            id="waterTemp"
+            class="temp loading">
+            Loading...
         </div>
+
+        <div class="source">
+            Water temperature from NDBC Station 46053,
+            East Santa Barbara.
+        </div>
+
     </div>
 
+
+    <!-- TIDES -->
+
     <div class="section">
+
         <h2>🌊 TODAY'S TIDES</h2>
 
-        <div id="tides">
-            Loading tides...
+        <div id="tides" class="loading">
+            Loading today's tides...
         </div>
+
     </div>
 
+
+    <!-- FOOTER -->
+
     <div class="footer">
-        Live data • Updated automatically<br>
-        Harvest buoy data: CDIP<br>
-        Tide data: NOAA
+
+        <strong>LIVE SURF CARD</strong><br>
+
+        Harvest swell: CDIP Station 071<br>
+        Water temperature: NDBC Station 46053<br>
+        Tides: NOAA Santa Barbara Station 9411340
+
+        <div
+            id="updated"
+            class="status">
+        </div>
+
     </div>
 
 </div>
 
+
 <script>
+
+/*
+====================================================
+DATE
+====================================================
+*/
 
 const today = new Date();
 
 document.getElementById("date").innerText =
-    today.toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric"
-    });
+    today.toLocaleDateString(
+        "en-US",
+        {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            year: "numeric"
+        }
+    );
+
 
 /*
-----------------------------------------------------
+====================================================
 HARVEST BUOY
-CDIP station 071 = HARVEST, CA
-----------------------------------------------------
+CDIP STATION 071
+====================================================
 */
 
 async function loadHarvest() {
 
     try {
 
-        /*
-        CDIP realtime parameter data.
-        */
-
         const url =
         "https://cdip.ucsd.edu/data_access/rtp/071p1_rt.txt";
 
         const response = await fetch(url);
 
-        if (!response.ok)
-            throw new Error("Buoy unavailable");
+        if (!response.ok) {
+            throw new Error("Harvest buoy unavailable");
+        }
 
         const text = await response.text();
 
-        const lines = text.trim().split("\n");
+        const lines =
+            text.trim().split("\n");
+
 
         /*
-        Find the most recent usable data row.
+        Search backwards for the newest usable row.
         */
 
         let row = null;
 
-        for (let i = lines.length - 1; i >= 0; i--) {
+        for (
+            let i = lines.length - 1;
+            i >= 0;
+            i--
+        ) {
 
-            const parts = lines[i].trim().split(/\s+/);
+            const parts =
+                lines[i]
+                .trim()
+                .split(/\s+/);
 
-            if (parts.length >= 8 && !isNaN(parseFloat(parts[5]))) {
+            if (
+                parts.length >= 8 &&
+                !isNaN(parseFloat(parts[5]))
+            ) {
+
                 row = parts;
                 break;
+
             }
         }
 
-        if (!row)
-            throw new Error("No buoy data");
+
+        if (!row) {
+            throw new Error("No Harvest data");
+        }
+
 
         /*
-        CDIP fields:
-        date/time
-        Hs
-        Tp
-        ...
+        Convert significant wave height
+        from meters to feet.
         */
 
-        const hsMeters = parseFloat(row[5]);
-        const period = parseFloat(row[6]);
+        const heightMeters =
+            parseFloat(row[5]);
 
-        const feet = hsMeters * 3.28084;
+        const period =
+            parseFloat(row[6]);
+
+        const heightFeet =
+            heightMeters * 3.28084;
+
 
         document.getElementById("buoy").innerHTML = `
 
             <div class="big">
-                ${feet.toFixed(1)} ft
+                ${heightFeet.toFixed(1)} ft
             </div>
 
             <div class="row">
-                <span class="label">Period</span>
-                <strong>${period.toFixed(0)} sec</strong>
+
+                <span class="label">
+                    Swell period
+                </span>
+
+                <span class="value">
+                    ${period.toFixed(0)} sec
+                </span>
+
             </div>
 
             <div class="row">
-                <span class="label">Station</span>
-                <strong>Harvest 071</strong>
+
+                <span class="label">
+                    Buoy
+                </span>
+
+                <span class="value">
+                    Harvest 071
+                </span>
+
             </div>
 
         `;
 
-    } catch (error) {
+    }
+
+    catch(error) {
+
+        console.error(
+            "Harvest:",
+            error
+        );
 
         document.getElementById("buoy").innerHTML =
-            "Buoy data temporarily unavailable.<br><br>" +
-            "Open 17ft for the live Harvest reading.";
+            "Harvest buoy data temporarily unavailable.";
 
     }
+
 }
 
 
 /*
-----------------------------------------------------
-NOAA TIDES
-Santa Barbara station
-----------------------------------------------------
+====================================================
+CAMPUS POINT AREA WATER TEMPERATURE
+NDBC STATION 46053
+====================================================
+*/
+
+async function loadWaterTemp() {
+
+    try {
+
+        const url =
+        "https://www.ndbc.noaa.gov/data/realtime2/46053.txt";
+
+        const response =
+            await fetch(url);
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Temperature unavailable"
+            );
+
+        }
+
+
+        const text =
+            await response.text();
+
+        const lines =
+            text.trim().split("\n");
+
+
+        /*
+        First row contains column names.
+        Locate the WTMP column.
+        */
+
+        const headers =
+            lines[0]
+            .trim()
+            .split(/\s+/);
+
+        const tempIndex =
+            headers.indexOf("WTMP");
+
+
+        if (tempIndex === -1) {
+
+            throw new Error(
+                "WTMP column not found"
+            );
+
+        }
+
+
+        let tempC = null;
+
+
+        /*
+        Find newest valid water
+        temperature observation.
+        */
+
+        for (
+            let i = 2;
+            i < lines.length;
+            i++
+        ) {
+
+            const parts =
+                lines[i]
+                .trim()
+                .split(/\s+/);
+
+            const value =
+                parseFloat(
+                    parts[tempIndex]
+                );
+
+
+            /*
+            NDBC uses large values such as
+            999 for missing observations.
+            */
+
+            if (
+                !isNaN(value) &&
+                value > -10 &&
+                value < 60
+            ) {
+
+                tempC = value;
+                break;
+
+            }
+
+        }
+
+
+        if (tempC === null) {
+
+            throw new Error(
+                "No valid water temperature"
+            );
+
+        }
+
+
+        /*
+        Celsius -> Fahrenheit
+        */
+
+        const tempF =
+            (tempC * 9 / 5) + 32;
+
+
+        document.getElementById(
+            "waterTemp"
+        ).innerText =
+            tempF.toFixed(1) + "°F";
+
+
+        document.getElementById(
+            "waterTemp"
+        ).classList.remove(
+            "loading"
+        );
+
+    }
+
+    catch(error) {
+
+        console.error(
+            "Water temperature:",
+            error
+        );
+
+        document.getElementById(
+            "waterTemp"
+        ).innerText =
+            "Unavailable";
+
+    }
+
+}
+
+
+/*
+====================================================
+TODAY'S TIDES
+NOAA STATION 9411340
+SANTA BARBARA
+====================================================
 */
 
 async function loadTides() {
 
     try {
 
-        const year = today.getFullYear();
-        const month = String(today.getMonth()+1).padStart(2,"0");
-        const day = String(today.getDate()).padStart(2,"0");
+        /*
+        Create today's date in
+        YYYYMMDD format.
+        */
 
-        const begin =
+        const year =
+            today.getFullYear();
+
+        const month =
+            String(
+                today.getMonth() + 1
+            ).padStart(2, "0");
+
+        const day =
+            String(
+                today.getDate()
+            ).padStart(2, "0");
+
+        const dateString =
             `${year}${month}${day}`;
 
+
         const url =
-        `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=harvestsurf&begin_date=${begin}&end_date=${begin}&datum=MLLW&station=9411340&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+            "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter" +
+            "?product=predictions" +
+            "&application=S17Surf" +
+            "&begin_date=" + dateString +
+            "&end_date=" + dateString +
+            "&datum=MLLW" +
+            "&station=9411340" +
+            "&time_zone=lst_ldt" +
+            "&units=english" +
+            "&interval=hilo" +
+            "&format=json";
 
-        const response = await fetch(url);
 
-        const data = await response.json();
+        const response =
+            await fetch(url);
 
-        if (!data.predictions)
-            throw new Error("No tide data");
+        if (!response.ok) {
+
+            throw new Error(
+                "Tide service unavailable"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !data.predictions ||
+            data.predictions.length === 0
+        ) {
+
+            throw new Error(
+                "No tide predictions"
+            );
+
+        }
+
 
         let html = "";
 
-        data.predictions.forEach(tide => {
 
-            const type =
-                tide.type === "H"
-                ? "HIGH"
-                : "LOW";
+        data.predictions.forEach(
+            tide => {
 
-            html += `
-                <div class="tide">
-                    <strong>${type}</strong>
-                    &nbsp; ${tide.t} 
-                    <span style="float:right">
-                        ${parseFloat(tide.v).toFixed(1)} ft
-                    </span>
-                </div>
-            `;
-        });
+                const type =
+                    tide.type === "H"
+                    ? "HIGH"
+                    : "LOW";
 
-        document.getElementById("tides").innerHTML = html;
 
-    } catch(error) {
+                /*
+                NOAA returns:
+                YYYY-MM-DD HH:MM
+                */
 
-        document.getElementById("tides").innerHTML =
-            "Tide data temporarily unavailable.";
+                const time =
+                    tide.t.split(" ")[1];
+
+
+                /*
+                Convert 24-hour time
+                to normal AM/PM.
+                */
+
+                const timeParts =
+                    time.split(":");
+
+                let hour =
+                    parseInt(
+                        timeParts[0]
+                    );
+
+                const minute =
+                    timeParts[1];
+
+                const ampm =
+                    hour >= 12
+                    ? "PM"
+                    : "AM";
+
+                hour =
+                    hour % 12;
+
+                if (hour === 0) {
+                    hour = 12;
+                }
+
+
+                const displayTime =
+                    `${hour}:${minute} ${ampm}`;
+
+
+                html += `
+
+                    <div class="tide">
+
+                        <span class="tide-type">
+                            ${type}
+                        </span>
+
+                        <span class="tide-time">
+                            ${displayTime}
+                        </span>
+
+                        <span class="tide-height">
+                            ${parseFloat(tide.v).toFixed(1)} ft
+                        </span>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+
+        document.getElementById(
+            "tides"
+        ).innerHTML =
+            html;
 
     }
+
+    catch(error) {
+
+        console.error(
+            "Tides:",
+            error
+        );
+
+        document.getElementById(
+            "tides"
+        ).innerHTML =
+            "Today's tide data is temporarily unavailable.";
+
+    }
+
 }
 
 
 /*
-----------------------------------------------------
-WATER TEMPERATURE
-----------------------------------------------------
-Placeholder until we connect the correct
-Campus Point station.
+====================================================
+LAST UPDATED
+====================================================
 */
 
-document.getElementById("waterTemp").innerText =
-    "Connecting...";
+function updateTimestamp() {
 
+    const now =
+        new Date();
+
+    document.getElementById(
+        "updated"
+    ).innerText =
+        "Card loaded: " +
+        now.toLocaleTimeString(
+            "en-US",
+            {
+                hour: "numeric",
+                minute: "2-digit"
+            }
+        );
+
+}
+
+
+/*
+====================================================
+LOAD EVERYTHING
+====================================================
+*/
 
 loadHarvest();
+
+loadWaterTemp();
+
 loadTides();
+
+updateTimestamp();
 
 </script>
 
