@@ -1,15 +1,14 @@
 {
   "date_display": "Saturday, September 12, 2026",
-  "updated_display": "11:45 AM PDT",
+  "updated_display": "12:07 PM PDT",
   "harvest": {
     "wave_height_ft": 4.9,
-    "period_sec": 13.0,
-    "direction_deg": 237.0,
-    "buoy_temp_f": 66.6
+    "period_sec": 14.0,
+    "direction_deg": 215.0
   },
   "water_temp": {
     "station": "46053",
-    "temp_f": 71.2
+    "temp_f": 71.4
   },
   "tides": [
     {
@@ -32,5 +31,10 @@
       "time": "11:16 PM",
       "height_ft": 4.9
     }
-  ]
+  ],
+  "campus_cam": {
+    "video_id": "-Q20DkjKgpM",
+    "title": "Campus Point Surf Cam",
+    "channel": "GRIT"
+  }
 }
