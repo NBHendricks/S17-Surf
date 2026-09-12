@@ -1,0 +1,36 @@
+{
+  "date_display": "Saturday, September 12, 2026",
+  "updated_display": "11:08 AM PDT",
+  "harvest": {
+    "wave_height_ft": 4.6,
+    "period_sec": 14.0,
+    "direction_deg": 215.0,
+    "buoy_temp_f": 66.4
+  },
+  "water_temp": {
+    "station": "46053",
+    "temp_f": 71.2
+  },
+  "tides": [
+    {
+      "type": "LOW",
+      "time": "4:44 AM",
+      "height_ft": 0.5
+    },
+    {
+      "type": "HIGH",
+      "time": "10:58 AM",
+      "height_ft": 5.5
+    },
+    {
+      "type": "LOW",
+      "time": "5:12 PM",
+      "height_ft": 0.7
+    },
+    {
+      "type": "HIGH",
+      "time": "11:16 PM",
+      "height_ft": 4.9
+    }
+  ]
+}
