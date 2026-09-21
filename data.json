@@ -1,14 +1,14 @@
 {
   "date_display": "Sunday, September 20, 2026",
-  "updated_display": "5:50 PM PDT",
+  "updated_display": "6:19 PM PDT",
   "harvest": {
-    "wave_height_ft": 5.2,
+    "wave_height_ft": 5.6,
     "period_sec": 8.0,
-    "direction_deg": 319.0
+    "direction_deg": 321.0
   },
   "water_temp": {
     "station": "46053",
-    "temp_f": 70.0
+    "temp_f": 69.6
   },
   "tides": [
     {
