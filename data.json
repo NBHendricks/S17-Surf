@@ -1,35 +1,35 @@
 {
-  "date_display": "Saturday, September 26, 2026",
-  "updated_display": "11:50 PM PDT",
+  "date_display": "Sunday, September 27, 2026",
+  "updated_display": "12:20 AM PDT",
   "harvest": {
     "wave_height_ft": 7.2,
     "period_sec": 9.0,
-    "direction_deg": 313.0
+    "direction_deg": 305.0
   },
   "water_temp": {
     "station": "46053",
-    "temp_f": 72.3
+    "temp_f": null
   },
   "tides": [
     {
       "type": "LOW",
-      "time": "3:43 AM",
-      "height_ft": 0.6
+      "time": "4:08 AM",
+      "height_ft": 1.0
     },
     {
       "type": "HIGH",
-      "time": "9:55 AM",
-      "height_ft": 5.4
+      "time": "10:20 AM",
+      "height_ft": 5.7
     },
     {
       "type": "LOW",
-      "time": "4:06 PM",
-      "height_ft": 0.7
+      "time": "4:48 PM",
+      "height_ft": 0.4
     },
     {
       "type": "HIGH",
-      "time": "10:13 PM",
-      "height_ft": 5.0
+      "time": "10:57 PM",
+      "height_ft": 4.7
     }
   ],
   "campus_cam": {
