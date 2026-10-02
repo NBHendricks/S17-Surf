@@ -1,10 +1,10 @@
 {
-  "date_display": "Thursday, October 1, 2026",
-  "updated_display": "11:54 PM PDT",
+  "date_display": "Friday, October 2, 2026",
+  "updated_display": "12:24 AM PDT",
   "harvest": {
-    "wave_height_ft": 5.9,
+    "wave_height_ft": 5.2,
     "period_sec": 11.0,
-    "direction_deg": 289.0
+    "direction_deg": 276.0
   },
   "water_temp": {
     "station": "46053",
@@ -13,22 +13,22 @@
   "tides": [
     {
       "type": "HIGH",
-      "time": "2:14 AM",
-      "height_ft": 3.4
+      "time": "4:20 AM",
+      "height_ft": 3.3
     },
     {
       "type": "LOW",
-      "time": "6:03 AM",
-      "height_ft": 2.7
+      "time": "6:51 AM",
+      "height_ft": 3.1
     },
     {
       "type": "HIGH",
-      "time": "12:51 PM",
-      "height_ft": 5.9
+      "time": "1:58 PM",
+      "height_ft": 5.6
     },
     {
       "type": "LOW",
-      "time": "8:50 PM",
+      "time": "10:21 PM",
       "height_ft": 0.2
     }
   ],
