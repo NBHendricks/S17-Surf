@@ -1,9 +1,9 @@
 {
   "date_display": "Thursday, October 8, 2026",
-  "updated_display": "12:25 AM PDT",
+  "updated_display": "12:52 AM PDT",
   "harvest": {
-    "wave_height_ft": 4.9,
-    "period_sec": 13.0,
+    "wave_height_ft": 5.2,
+    "period_sec": 10.0,
     "direction_deg": 271.0
   },
   "water_temp": {
