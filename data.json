@@ -1,6 +1,6 @@
 {
-  "date_display": "Friday, October 9, 2026",
-  "updated_display": "11:54 PM PDT",
+  "date_display": "Saturday, October 10, 2026",
+  "updated_display": "12:22 AM PDT",
   "harvest": {
     "wave_height_ft": 6.6,
     "period_sec": 14.0,
@@ -13,23 +13,23 @@
   "tides": [
     {
       "type": "LOW",
-      "time": "3:05 AM",
-      "height_ft": 0.6
+      "time": "3:32 AM",
+      "height_ft": 1.0
     },
     {
       "type": "HIGH",
-      "time": "9:19 AM",
-      "height_ft": 5.7
+      "time": "9:45 AM",
+      "height_ft": 5.9
     },
     {
       "type": "LOW",
-      "time": "3:40 PM",
-      "height_ft": 0.4
+      "time": "4:20 PM",
+      "height_ft": 0.1
     },
     {
       "type": "HIGH",
-      "time": "9:43 PM",
-      "height_ft": 5.0
+      "time": "10:27 PM",
+      "height_ft": 4.6
     }
   ],
   "campus_cam": {
