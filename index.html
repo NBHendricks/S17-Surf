@@ -1,15 +1,17 @@
+Click Edit, delete everything, and paste this:
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-<meta http-equiv="Cache-Control"
-content="no-cache">
-
-<title>SB County Surf Report</title>
+<title>S17 Surf | Campus Point</title>
 
 <style>
 
@@ -20,38 +22,38 @@ content="no-cache">
 body {
     margin: 0;
     padding: 16px;
-    background: #ececec;
-    font-family: Arial, Helvetica, sans-serif;
+    background: #e9edf0;
+    font-family: Arial, sans-serif;
     color: #111;
 }
 
 .card {
-    max-width: 500px;
-    margin: 0 auto;
+    max-width: 520px;
+    margin: auto;
     background: white;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,.15);
+    box-shadow: 0 5px 22px rgba(0,0,0,.15);
 }
 
 .header {
     background: #111;
     color: white;
-    padding: 24px 20px;
+    padding: 25px 20px;
 }
 
 .header h1 {
     margin: 0;
-    font-size: 28px;
+    font-size: 30px;
 }
 
 .header p {
-    margin: 7px 0 0;
+    margin: 8px 0 0;
     color: #bbb;
 }
 
 .section {
-    padding: 21px 20px;
+    padding: 22px 20px;
     border-bottom: 1px solid #ddd;
 }
 
@@ -61,16 +63,16 @@ body {
 }
 
 .big {
-    font-size: 46px;
+    font-size: 48px;
     font-weight: bold;
+    margin-bottom: 12px;
 }
 
 .row {
     display: flex;
     justify-content: space-between;
     gap: 15px;
-    padding: 7px 0;
-    font-size: 17px;
+    padding: 8px 0;
 }
 
 .label {
@@ -83,7 +85,7 @@ body {
 }
 
 .temp {
-    font-size: 43px;
+    font-size: 45px;
     font-weight: bold;
 }
 
@@ -91,43 +93,28 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
     background: #f3f3f3;
-    padding: 13px;
-    margin: 8px 0;
     border-radius: 10px;
+    padding: 14px;
+    margin: 8px 0;
 }
 
 .tide-type {
     font-weight: bold;
-    min-width: 48px;
-}
-
-.tide-time {
-    color: #555;
 }
 
 .tide-height {
     font-weight: bold;
 }
 
-.loading {
-    color: #777;
-}
-
-.source {
-    margin-top: 8px;
-    color: #777;
-    font-size: 12px;
-    line-height: 1.4;
-}
-
 .video-wrap {
     position: relative;
     width: 100%;
     padding-top: 56.25%;
-    overflow: hidden;
-    border-radius: 12px;
     background: #000;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 .video-wrap iframe {
@@ -135,36 +122,47 @@ body {
     inset: 0;
     width: 100%;
     height: 100%;
-    border: 0;
+    border: none;
 }
 
 .cam-button {
     display: block;
-    width: 100%;
-    margin-top: 14px;
-    padding: 14px 16px;
     background: #111;
     color: white;
-    text-decoration: none;
     text-align: center;
+    text-decoration: none;
+    padding: 15px;
+    margin-top: 14px;
     border-radius: 10px;
-    font-weight: bold;
     font-size: 16px;
+    font-weight: bold;
 }
 
-.footer {
-    padding: 17px 20px;
-    background: #fafafa;
+.source {
     color: #777;
     font-size: 12px;
+    margin-top: 12px;
     line-height: 1.5;
+}
+
+.loading {
+    color: #777;
 }
 
 .error {
     color: #a00;
 }
 
+.footer {
+    padding: 18px 20px;
+    background: #fafafa;
+    color: #777;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -172,7 +170,8 @@ body {
 <div class="card">
 
     <div class="header">
-        <h1>SB County Surf</h1>
+        <h1>S17 SURF</h1>
+        <p>CAMPUS POINT</p>
         <p id="date">Loading...</p>
     </div>
 
@@ -181,15 +180,12 @@ body {
 
         <h2>🌊 HARVEST BUOY</h2>
 
-        <div id="harvest"
-             class="loading">
-
+        <div id="harvest" class="loading">
             Loading swell...
-
         </div>
 
         <div class="source">
-            Harvest / CDIP 071 / NDBC 46218
+            CDIP 071 / NDBC 46218
         </div>
 
     </div>
@@ -197,18 +193,16 @@ body {
 
     <div class="section">
 
-        <h2>🌡️ CAMPUS POINT AREA</h2>
+        <h2>🌡️ CAMPUS POINT AREA WATER TEMP</h2>
 
-        <div id="waterTemp"
-             class="temp loading">
-
+        <div id="waterTemp" class="temp loading">
             Loading...
-
         </div>
 
         <div class="source">
-            Water temperature from NDBC 46053,
-            East Santa Barbara
+            NDBC 46053 — East Santa Barbara.
+            Regional water temperature, not a
+            measurement taken directly at Campus Point.
         </div>
 
     </div>
@@ -218,15 +212,13 @@ body {
 
         <h2>🌊 TODAY'S TIDES</h2>
 
-        <div id="tides"
-             class="loading">
-
+        <div id="tides" class="loading">
             Loading tides...
-
         </div>
 
         <div class="source">
-            NOAA Santa Barbara 9411340
+            NOAA Santa Barbara 9411340.
+            Predicted heights relative to MLLW.
         </div>
 
     </div>
@@ -236,15 +228,13 @@ body {
 
         <h2>📹 LIVE CAMPUS POINT</h2>
 
-        <div id="campusCam"
-             class="loading">
-
-            Finding current live stream...
-
+        <div id="campusCam" class="loading">
+            Finding live camera...
         </div>
 
         <div class="source">
-            Campus Point live surf cam
+            Campus Point surf camera.
+            Stream availability depends on the broadcaster.
         </div>
 
     </div>
@@ -252,9 +242,13 @@ body {
 
     <div class="footer">
 
-        <strong>LIVE SURF CARD</strong><br>
+        <strong>S17 LIVE SURF CARD</strong>
 
-        Data refreshes automatically.<br>
+        <br>
+
+        Surf information updates automatically.
+
+        <br>
 
         <span id="updated"></span>
 
@@ -265,25 +259,33 @@ body {
 
 <script>
 
+
 function compassDirection(degrees) {
 
-    if (
-        degrees === null ||
-        degrees === undefined
-    ) {
-        return "";
+    if (degrees === null || degrees === undefined) {
+        return "—";
     }
 
     const directions = [
-        "N","NNE","NE","ENE",
-        "E","ESE","SE","SSE",
-        "S","SSW","SW","WSW",
-        "W","WNW","NW","NNW"
+        "N", "NNE", "NE", "ENE",
+        "E", "ESE", "SE", "SSE",
+        "S", "SSW", "SW", "WSW",
+        "W", "WNW", "NW", "NNW"
     ];
 
     return directions[
         Math.round(degrees / 22.5) % 16
     ];
+}
+
+
+function formatNumber(value, decimals = 1) {
+
+    if (value === null || value === undefined) {
+        return "—";
+    }
+
+    return Number(value).toFixed(decimals);
 }
 
 
@@ -293,296 +295,240 @@ async function loadData() {
 
         const response = await fetch(
             "data.json?t=" + Date.now(),
-            {
-                cache: "no-store"
-            }
+            { cache: "no-store" }
         );
 
         if (!response.ok) {
-            throw new Error(
-                "data.json unavailable"
-            );
+            throw new Error("Unable to load surf data");
         }
 
         const data = await response.json();
 
 
-        /*
-        DATE
-        */
+        // DATE
 
-        document.getElementById(
-            "date"
-        ).innerText =
-            data.date_display;
+        document.getElementById("date").textContent =
+            data.date_display || "Current conditions";
 
 
-        /*
-        HARVEST
-        */
+        // HARVEST BUOY
 
-        if (
-            data.harvest &&
-            data.harvest.wave_height_ft !== null
-        ) {
+        const harvest = data.harvest;
 
-            let directionText =
-                "Unavailable";
+        if (harvest && harvest.wave_height_ft !== null) {
 
-            if (
-                data.harvest.direction_deg !== null
-            ) {
+            const direction = (
+                harvest.direction_deg !== null &&
+                harvest.direction_deg !== undefined
+            )
+                ? compassDirection(harvest.direction_deg)
+                    + " "
+                    + Math.round(harvest.direction_deg)
+                    + "°"
+                : "—";
 
-                directionText =
-                    compassDirection(
-                        data.harvest.direction_deg
-                    ) +
-                    " " +
-                    Math.round(
-                        data.harvest.direction_deg
-                    ) +
-                    "°";
-
-            }
-
-            let periodText =
-                "Unavailable";
-
-            if (
-                data.harvest.period_sec !== null
-            ) {
-
-                periodText =
-                    data.harvest.period_sec.toFixed(0)
-                    + " sec";
-
-            }
-
-            document.getElementById(
-                "harvest"
-            ).innerHTML = `
+            document.getElementById("harvest").innerHTML = `
 
                 <div class="big">
-                    ${data.harvest.wave_height_ft.toFixed(1)} ft
+                    ${formatNumber(harvest.wave_height_ft)} ft
                 </div>
 
                 <div class="row">
-
                     <span class="label">
                         Dominant period
                     </span>
 
                     <span class="value">
-                        ${periodText}
+                        ${formatNumber(harvest.period_sec, 0)}
+                        sec
                     </span>
-
                 </div>
 
                 <div class="row">
-
                     <span class="label">
                         Direction
                     </span>
 
                     <span class="value">
-                        ${directionText}
+                        ${direction}
                     </span>
-
                 </div>
 
             `;
 
         } else {
 
-            document.getElementById(
-                "harvest"
-            ).innerHTML =
-                '<span class="error">' +
-                'Harvest data unavailable' +
-                '</span>';
+            document.getElementById("harvest").textContent =
+                "Harvest buoy data temporarily unavailable";
 
         }
 
 
-        /*
-        WATER TEMP
-        */
+        // WATER TEMPERATURE
+
+        const water = data.water_temp;
 
         if (
-            data.water_temp &&
-            data.water_temp.temp_f !== null
+            water &&
+            water.temp_f !== null &&
+            water.temp_f !== undefined
         ) {
 
-            document.getElementById(
-                "waterTemp"
-            ).innerText =
-                data.water_temp.temp_f.toFixed(1)
-                + "°F";
+            document.getElementById("waterTemp").textContent =
+                formatNumber(water.temp_f) + "°F";
 
         } else {
 
-            document.getElementById(
-                "waterTemp"
-            ).innerText =
+            document.getElementById("waterTemp").textContent =
                 "Unavailable";
 
         }
 
 
-        /*
-        TIDES
-        */
+        // TIDES
 
-        if (
-            data.tides &&
-            data.tides.length > 0
-        ) {
+        const tideContainer = document.getElementById("tides");
 
-            let html = "";
+        if (data.tides && data.tides.length > 0) {
 
-            data.tides.forEach(
-                tide => {
+            tideContainer.innerHTML = "";
 
-                    html += `
+            data.tides.forEach(tide => {
 
-                        <div class="tide">
+                const row = document.createElement("div");
 
-                            <span class="tide-type">
-                                ${tide.type}
-                            </span>
+                row.className = "tide";
 
-                            <span class="tide-time">
-                                ${tide.time}
-                            </span>
+                const type = document.createElement("span");
+                type.className = "tide-type";
+                type.textContent = tide.type;
 
-                            <span class="tide-height">
-                                ${tide.height_ft.toFixed(1)} ft
-                            </span>
+                const time = document.createElement("span");
+                time.textContent = tide.time;
 
-                        </div>
+                const height = document.createElement("span");
+                height.className = "tide-height";
+                height.textContent =
+                    formatNumber(tide.height_ft) + " ft";
 
-                    `;
+                row.append(type, time, height);
 
-                }
-            );
+                tideContainer.appendChild(row);
 
-            document.getElementById(
-                "tides"
-            ).innerHTML =
-                html;
+            });
 
         } else {
 
-            document.getElementById(
-                "tides"
-            ).innerHTML =
-                '<span class="error">' +
-                'Tides unavailable' +
-                '</span>';
+            tideContainer.textContent =
+                "Tide predictions temporarily unavailable";
 
         }
 
 
-        /*
-        CAMPUS POINT LIVE CAM
-        */
+        // LIVE CAMPUS POINT CAMERA
 
-        if (
-            data.campus_cam &&
-            data.campus_cam.video_id
-        ) {
+        const cameraContainer =
+            document.getElementById("campusCam");
 
-            const videoId =
-                data.campus_cam.video_id;
+        const camera = data.campus_cam;
 
-            const watchUrl =
-                "https://www.youtube.com/watch?v="
-                + videoId;
+        cameraContainer.innerHTML = "";
+
+        if (camera && camera.video_id) {
+
+            const videoId = camera.video_id;
 
             const embedUrl =
                 "https://www.youtube.com/embed/"
-                + videoId
-                + "?playsinline=1&rel=0";
+                + encodeURIComponent(videoId)
+                + "?playsinline=1";
 
-            document.getElementById(
-                "campusCam"
-            ).innerHTML = `
+            const watchUrl =
+                "https://www.youtube.com/watch?v="
+                + encodeURIComponent(videoId);
 
-                <div class="video-wrap">
+            const wrapper = document.createElement("div");
+            wrapper.className = "video-wrap";
 
-                    <iframe
-                        src="${embedUrl}"
-                        title="Campus Point Surf Cam"
-                        loading="lazy"
-                        allow="
-                            accelerometer;
-                            autoplay;
-                            clipboard-write;
-                            encrypted-media;
-                            gyroscope;
-                            picture-in-picture;
-                            web-share
-                        "
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        allowfullscreen>
-                    </iframe>
+            const iframe = document.createElement("iframe");
 
-                </div>
+            iframe.src = embedUrl;
+            iframe.title = "Campus Point Live Surf Cam";
+            iframe.loading = "lazy";
 
-                <a
-                    class="cam-button"
-                    href="${watchUrl}"
-                    target="_blank"
-                    rel="noopener noreferrer">
+            iframe.allow =
+                "autoplay; encrypted-media; picture-in-picture";
 
-                    ▶ OPEN LIVE CAMPUS POINT CAM
+            iframe.allowFullscreen = true;
 
-                </a>
+            wrapper.appendChild(iframe);
 
-            `;
+            cameraContainer.appendChild(wrapper);
+
+            const button = document.createElement("a");
+
+            button.className = "cam-button";
+            button.href = watchUrl;
+            button.target = "_blank";
+            button.rel = "noopener noreferrer";
+
+            button.textContent = "▶ OPEN LIVE CAMPUS POINT CAM";
+
+            cameraContainer.appendChild(button);
 
         } else {
 
-            document.getElementById(
-                "campusCam"
-            ).innerHTML = `
+            const message = document.createElement("p");
 
-                <span class="error">
-                    Live stream is currently unavailable.
-                </span>
+            message.textContent =
+                "No active Campus Point stream found right now.";
 
-            `;
+            cameraContainer.appendChild(message);
+
+            const button = document.createElement("a");
+
+            button.className = "cam-button";
+
+            button.href =
+                "https://www.youtube.com/results?search_query="
+                + encodeURIComponent("Campus Point Surf Cam GRIT");
+
+            button.target = "_blank";
+            button.rel = "noopener noreferrer";
+
+            button.textContent = "▶ FIND CAMPUS POINT CAM";
+
+            cameraContainer.appendChild(button);
 
         }
 
 
-        /*
-        UPDATED TIME
-        */
+        // LAST UPDATED
 
-        document.getElementById(
-            "updated"
-        ).innerText =
-            "Data updated: "
-            + data.updated_display;
+        document.getElementById("updated").textContent =
+            "Last updated: "
+            + (data.updated_display || "Unknown");
 
     }
 
-    catch(error) {
+    catch (error) {
 
         console.error(error);
 
-        document.getElementById(
-            "date"
-        ).innerText =
+        document.getElementById("date").textContent =
             "Surf data temporarily unavailable";
 
-        document.getElementById(
-            "campusCam"
-        ).innerHTML =
-            '<span class="error">' +
-            'Live cam data unavailable' +
-            '</span>';
+        document.getElementById("harvest").textContent =
+            "Unable to load data";
+
+        document.getElementById("waterTemp").textContent =
+            "Unavailable";
+
+        document.getElementById("tides").textContent =
+            "Unable to load tides";
+
+        document.getElementById("campusCam").textContent =
+            "Unable to load camera information";
 
     }
 
