@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html ="en">
+<html lang="en">
 
 <head>
 
@@ -60,6 +59,23 @@ body {
 .section h2 {
     margin: 0 0 16px;
     font-size: 19px;
+}
+
+/* Campus Point estimate gets special treatment */
+
+.surf-estimate {
+    background: #eef7fb;
+}
+
+.surf-estimate .big {
+    font-size: 54px;
+}
+
+.estimate-label {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: .5px;
+    margin-bottom: 8px;
 }
 
 .big {
@@ -169,44 +185,103 @@ body {
 
 <div class="card">
 
+
+    <!-- HEADER -->
+
     <div class="header">
+
         <h1>S17 SURF</h1>
+
         <p>CAMPUS POINT</p>
-        <p id="date">Loading...</p>
+
+        <p id="date">
+            Loading...
+        </p>
+
     </div>
 
 
+    <!-- CAMPUS POINT ESTIMATED SURF -->
+
+    <div class="section surf-estimate">
+
+        <div class="estimate-label">
+            CAMPUS POINT
+        </div>
+
+        <h2>🏄 ESTIMATED SURF</h2>
+
+        <div id="surfEstimate" class="loading">
+            Calculating...
+        </div>
+
+        <div class="source">
+            Experimental Campus Point breaking-wave estimate
+            based primarily on Harvest swell height, period,
+            and direction, adjusted for Campus Point exposure.
+            This is an estimate, not a measured breaking-wave height.
+        </div>
+
+    </div>
+
+
+    <!-- HARVEST BUOY -->
+
     <div class="section">
 
-        <h2>🌊 HARVEST BUOY</h2>
+        <h2>🌊 INCOMING SWELL — HARVEST</h2>
 
         <div id="harvest" class="loading">
             Loading swell...
         </div>
 
         <div class="source">
-            CDIP 071 / NDBC 46218
+            CDIP 071 / NDBC 46218.
+            Offshore swell measurement before the
+            Campus Point exposure adjustment.
         </div>
 
     </div>
 
 
+    <!-- CHANNEL BUOY -->
+
     <div class="section">
 
-        <h2>🌡️ CAMPUS POINT AREA WATER TEMP</h2>
+        <h2>🌊 SANTA BARBARA CHANNEL</h2>
+
+        <div id="channel" class="loading">
+            Loading channel conditions...
+        </div>
+
+        <div class="source">
+            NOAA/NDBC 46053 East Santa Barbara.
+            Used as additional information when
+            current wave observations are available.
+        </div>
+
+    </div>
+
+
+    <!-- WATER TEMPERATURE -->
+
+    <div class="section">
+
+        <h2>🌡️ CAMPUS POINT WATER TEMP</h2>
 
         <div id="waterTemp" class="temp loading">
             Loading...
         </div>
 
-        <div class="source">
-            NASA satellite-based sea surface temperature
-near Campus Point, with NOAA buoy backup.
-Estimated regional temperature.
+        <div id="waterSource" class="source">
+            NASA MUR satellite sea-surface temperature
+            near Campus Point.
         </div>
 
     </div>
 
+
+    <!-- TIDES -->
 
     <div class="section">
 
@@ -224,12 +299,14 @@ Estimated regional temperature.
     </div>
 
 
+    <!-- LIVE CAMERA -->
+
     <div class="section">
 
         <h2>📹 LIVE CAMPUS POINT</h2>
 
         <div id="campusCam" class="loading">
-            Finding live camera...
+            Loading live camera...
         </div>
 
         <div class="source">
@@ -239,6 +316,8 @@ Estimated regional temperature.
 
     </div>
 
+
+    <!-- FOOTER -->
 
     <div class="footer">
 
@@ -254,6 +333,7 @@ Estimated regional temperature.
 
     </div>
 
+
 </div>
 
 
@@ -262,7 +342,10 @@ Estimated regional temperature.
 
 function compassDirection(degrees) {
 
-    if (degrees === null || degrees === undefined) {
+    if (
+        degrees === null ||
+        degrees === undefined
+    ) {
         return "—";
     }
 
@@ -279,13 +362,21 @@ function compassDirection(degrees) {
 }
 
 
-function formatNumber(value, decimals = 1) {
+function formatNumber(
+    value,
+    decimals = 1
+) {
 
-    if (value === null || value === undefined) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
         return "—";
     }
 
-    return Number(value).toFixed(decimals);
+    return Number(value).toFixed(
+        decimals
+    );
 }
 
 
@@ -295,56 +386,157 @@ async function loadData() {
 
         const response = await fetch(
             "data.json?t=" + Date.now(),
-            { cache: "no-store" }
+            {
+                cache: "no-store"
+            }
         );
 
         if (!response.ok) {
-            throw new Error("Unable to load surf data");
+
+            throw new Error(
+                "Unable to load surf data"
+            );
         }
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
+        // =============================================
         // DATE
+        // =============================================
 
-        document.getElementById("date").textContent =
-            data.date_display || "Current conditions";
+        document.getElementById(
+            "date"
+        ).textContent =
+            data.date_display ||
+            "Current conditions";
 
 
+        // =============================================
+        // CAMPUS POINT ESTIMATED SURF
+        // =============================================
+
+        const estimate =
+            data.surf_estimate;
+
+        const estimateContainer =
+            document.getElementById(
+                "surfEstimate"
+            );
+
+        if (
+            estimate &&
+            estimate.low_ft !== null &&
+            estimate.low_ft !== undefined &&
+            estimate.high_ft !== null &&
+            estimate.high_ft !== undefined
+        ) {
+
+            estimateContainer.innerHTML = `
+
+                <div class="big">
+                    ${formatNumber(
+                        estimate.low_ft,
+                        1
+                    )}
+                    –
+                    ${formatNumber(
+                        estimate.high_ft,
+                        1
+                    )}
+                    ft
+                </div>
+
+                <div class="row">
+
+                    <span class="label">
+                        Forecast method
+                    </span>
+
+                    <span class="value">
+                        Campus adjusted
+                    </span>
+
+                </div>
+
+            `;
+
+        } else {
+
+            estimateContainer.innerHTML = `
+
+                <div class="error">
+                    Campus Point estimate
+                    temporarily unavailable
+                </div>
+
+            `;
+        }
+
+
+        // =============================================
         // HARVEST BUOY
+        // =============================================
 
-        const harvest = data.harvest;
+        const harvest =
+            data.harvest;
 
-        if (harvest && harvest.wave_height_ft !== null) {
+        if (
+            harvest &&
+            harvest.wave_height_ft !== null &&
+            harvest.wave_height_ft !== undefined
+        ) {
 
             const direction = (
                 harvest.direction_deg !== null &&
                 harvest.direction_deg !== undefined
             )
-                ? compassDirection(harvest.direction_deg)
+                ? compassDirection(
+                    harvest.direction_deg
+                )
                     + " "
-                    + Math.round(harvest.direction_deg)
+                    + Math.round(
+                        harvest.direction_deg
+                    )
                     + "°"
+
                 : "—";
 
-            document.getElementById("harvest").innerHTML = `
+
+            document.getElementById(
+                "harvest"
+            ).innerHTML = `
 
                 <div class="big">
-                    ${formatNumber(harvest.wave_height_ft)} ft
+
+                    ${formatNumber(
+                        harvest.wave_height_ft
+                    )} ft
+
                 </div>
 
+
                 <div class="row">
+
                     <span class="label">
                         Dominant period
                     </span>
 
                     <span class="value">
-                        ${formatNumber(harvest.period_sec, 0)}
-                        sec
+
+                        ${formatNumber(
+                            harvest.period_sec,
+                            0
+                        )} sec
+
                     </span>
+
                 </div>
 
+
                 <div class="row">
+
                     <span class="label">
                         Direction
                     </span>
@@ -352,21 +544,129 @@ async function loadData() {
                     <span class="value">
                         ${direction}
                     </span>
+
                 </div>
 
             `;
 
         } else {
 
-            document.getElementById("harvest").textContent =
+            document.getElementById(
+                "harvest"
+            ).textContent =
                 "Harvest buoy data temporarily unavailable";
-
         }
 
 
-        // WATER TEMPERATURE
+        // =============================================
+        // EAST SANTA BARBARA CHANNEL BUOY
+        // =============================================
 
-        const water = data.water_temp;
+        const channel =
+            data.channel;
+
+        const channelContainer =
+            document.getElementById(
+                "channel"
+            );
+
+        if (
+            channel &&
+            channel.wave_height_ft !== null &&
+            channel.wave_height_ft !== undefined
+        ) {
+
+            const channelDirection = (
+                channel.direction_deg !== null &&
+                channel.direction_deg !== undefined
+            )
+                ? compassDirection(
+                    channel.direction_deg
+                )
+                    + " "
+                    + Math.round(
+                        channel.direction_deg
+                    )
+                    + "°"
+
+                : "—";
+
+
+            channelContainer.innerHTML = `
+
+                <div class="big">
+
+                    ${formatNumber(
+                        channel.wave_height_ft
+                    )} ft
+
+                </div>
+
+
+                <div class="row">
+
+                    <span class="label">
+                        Dominant period
+                    </span>
+
+                    <span class="value">
+
+                        ${formatNumber(
+                            channel.period_sec,
+                            0
+                        )} sec
+
+                    </span>
+
+                </div>
+
+
+                <div class="row">
+
+                    <span class="label">
+                        Direction
+                    </span>
+
+                    <span class="value">
+                        ${channelDirection}
+                    </span>
+
+                </div>
+
+            `;
+
+        } else {
+
+            channelContainer.innerHTML = `
+
+                <div class="source">
+                    Current wave observation
+                    unavailable from buoy 46053.
+                    Campus estimate is continuing
+                    from Harvest data.
+                </div>
+
+            `;
+        }
+
+
+        // =============================================
+        // NASA SATELLITE WATER TEMPERATURE
+        // =============================================
+
+        const water =
+            data.water_temp;
+
+        const waterTemp =
+            document.getElementById(
+                "waterTemp"
+            );
+
+        const waterSource =
+            document.getElementById(
+                "waterSource"
+            );
+
 
         if (
             water &&
@@ -374,170 +674,287 @@ async function loadData() {
             water.temp_f !== undefined
         ) {
 
-            document.getElementById("waterTemp").textContent =
-                formatNumber(water.temp_f) + "°F";
+            waterTemp.textContent =
+                formatNumber(
+                    water.temp_f
+                )
+                + "°F";
+
+
+            waterSource.textContent =
+                water.source ||
+                "NASA MUR satellite SST near Campus Point";
 
         } else {
 
-            document.getElementById("waterTemp").textContent =
+            waterTemp.textContent =
                 "Unavailable";
 
+            waterSource.textContent =
+                "NASA MUR satellite SST temporarily unavailable";
         }
 
 
+        // =============================================
         // TIDES
+        // =============================================
 
-        const tideContainer = document.getElementById("tides");
+        const tideContainer =
+            document.getElementById(
+                "tides"
+            );
 
-        if (data.tides && data.tides.length > 0) {
+        if (
+            data.tides &&
+            data.tides.length > 0
+        ) {
 
-            tideContainer.innerHTML = "";
+            tideContainer.innerHTML =
+                "";
 
-            data.tides.forEach(tide => {
+            data.tides.forEach(
+                tide => {
 
-                const row = document.createElement("div");
+                    const row =
+                        document.createElement(
+                            "div"
+                        );
 
-                row.className = "tide";
+                    row.className =
+                        "tide";
 
-                const type = document.createElement("span");
-                type.className = "tide-type";
-                type.textContent = tide.type;
 
-                const time = document.createElement("span");
-                time.textContent = tide.time;
+                    const type =
+                        document.createElement(
+                            "span"
+                        );
 
-                const height = document.createElement("span");
-                height.className = "tide-height";
-                height.textContent =
-                    formatNumber(tide.height_ft) + " ft";
+                    type.className =
+                        "tide-type";
 
-                row.append(type, time, height);
+                    type.textContent =
+                        tide.type;
 
-                tideContainer.appendChild(row);
 
-            });
+                    const time =
+                        document.createElement(
+                            "span"
+                        );
+
+                    time.textContent =
+                        tide.time;
+
+
+                    const height =
+                        document.createElement(
+                            "span"
+                        );
+
+                    height.className =
+                        "tide-height";
+
+                    height.textContent =
+                        formatNumber(
+                            tide.height_ft
+                        )
+                        + " ft";
+
+
+                    row.append(
+                        type,
+                        time,
+                        height
+                    );
+
+                    tideContainer.appendChild(
+                        row
+                    );
+                }
+            );
 
         } else {
 
             tideContainer.textContent =
                 "Tide predictions temporarily unavailable";
-
         }
 
 
+        // =============================================
         // LIVE CAMPUS POINT CAMERA
+        // =============================================
 
         const cameraContainer =
-            document.getElementById("campusCam");
+            document.getElementById(
+                "campusCam"
+            );
 
-        const camera  = {
-    video_id: "sVENjHlL4Pk"
-};
+        const camera =
+            data.campus_cam || {
+                video_id:
+                    "sVENjHlL4Pk"
+            };
 
-        cameraContainer.innerHTML = "";
+        cameraContainer.innerHTML =
+            "";
 
-        if (camera && camera.video_id) {
 
-            const videoId = camera.video_id;
+        if (
+            camera &&
+            camera.video_id
+        ) {
+
+            const videoId =
+                camera.video_id;
+
 
             const embedUrl =
                 "https://www.youtube.com/embed/"
-                + encodeURIComponent(videoId)
+                + encodeURIComponent(
+                    videoId
+                )
                 + "?playsinline=1";
+
 
             const watchUrl =
                 "https://www.youtube.com/watch?v="
-                + encodeURIComponent(videoId);
+                + encodeURIComponent(
+                    videoId
+                );
 
-            const wrapper = document.createElement("div");
-            wrapper.className = "video-wrap";
 
-            const iframe = document.createElement("iframe");
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
 
-            iframe.src = embedUrl;
-            iframe.title = "Campus Point Live Surf Cam";
-            iframe.loading = "lazy";
+            wrapper.className =
+                "video-wrap";
+
+
+            const iframe =
+                document.createElement(
+                    "iframe"
+                );
+
+            iframe.src =
+                embedUrl;
+
+            iframe.title =
+                "Campus Point Live Surf Cam";
+
+            iframe.loading =
+                "lazy";
 
             iframe.allow =
                 "autoplay; encrypted-media; picture-in-picture";
 
-            iframe.allowFullscreen = true;
+            iframe.allowFullscreen =
+                true;
 
-            wrapper.appendChild(iframe);
 
-            cameraContainer.appendChild(wrapper);
+            wrapper.appendChild(
+                iframe
+            );
 
-            const button = document.createElement("a");
+            cameraContainer.appendChild(
+                wrapper
+            );
 
-            button.className = "cam-button";
-            button.href = watchUrl;
-            button.target = "_blank";
-            button.rel = "noopener noreferrer";
 
-            button.textContent = "▶ OPEN LIVE CAMPUS POINT CAM";
+            const button =
+                document.createElement(
+                    "a"
+                );
 
-            cameraContainer.appendChild(button);
+            button.className =
+                "cam-button";
+
+            button.href =
+                watchUrl;
+
+            button.target =
+                "_blank";
+
+            button.rel =
+                "noopener noreferrer";
+
+            button.textContent =
+                "▶ OPEN LIVE CAMPUS POINT CAM";
+
+
+            cameraContainer.appendChild(
+                button
+            );
 
         } else {
 
-            const message = document.createElement("p");
-
-            message.textContent =
-                "No active Campus Point stream found right now.";
-
-            cameraContainer.appendChild(message);
-
-            const button = document.createElement("a");
-
-            button.className = "cam-button";
-
-            button.href =
-                "https://www.youtube.com/results?search_query="
-                + encodeURIComponent("Campus Point Surf Cam GRIT");
-
-            button.target = "_blank";
-            button.rel = "noopener noreferrer";
-
-            button.textContent = "▶ FIND CAMPUS POINT CAM";
-
-            cameraContainer.appendChild(button);
-
+            cameraContainer.textContent =
+                "Campus Point camera temporarily unavailable";
         }
 
 
+        // =============================================
         // LAST UPDATED
+        // =============================================
 
-        document.getElementById("updated").textContent =
+        document.getElementById(
+            "updated"
+        ).textContent =
             "Last updated: "
-            + (data.updated_display || "Unknown");
+            + (
+                data.updated_display ||
+                "Unknown"
+            );
 
     }
+
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
 
-        document.getElementById("date").textContent =
+        document.getElementById(
+            "date"
+        ).textContent =
             "Surf data temporarily unavailable";
 
-        document.getElementById("harvest").textContent =
-            "Unable to load data";
+        document.getElementById(
+            "surfEstimate"
+        ).textContent =
+            "Unable to calculate Campus Point surf";
 
-        document.getElementById("waterTemp").textContent =
+        document.getElementById(
+            "harvest"
+        ).textContent =
+            "Unable to load Harvest data";
+
+        document.getElementById(
+            "channel"
+        ).textContent =
+            "Unable to load channel data";
+
+        document.getElementById(
+            "waterTemp"
+        ).textContent =
             "Unavailable";
 
-        document.getElementById("tides").textContent =
+        document.getElementById(
+            "tides"
+        ).textContent =
             "Unable to load tides";
 
-        document.getElementById("campusCam").textContent =
+        document.getElementById(
+            "campusCam"
+        ).textContent =
             "Unable to load camera information";
-
     }
-
 }
 
 
 loadData();
+
 
 </script>
 
