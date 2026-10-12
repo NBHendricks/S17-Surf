@@ -1,7 +1,7 @@
 {
   "location": "Campus Point, California",
   "date_display": "Monday, October 12, 2026",
-  "updated_display": "2:55 AM PDT",
+  "updated_display": "3:26 AM PDT",
   "harvest": {
     "station": "46218",
     "name": "Harvest",
@@ -30,9 +30,9 @@
   },
   "water_temp": {
     "station": "NASA MUR",
-    "temp_f": 71.4,
-    "source": "NASA MUR satellite SST near Campus Point",
-    "observed": "2026-10-10T09:00:00Z"
+    "temp_f": null,
+    "source": "NASA MUR satellite SST temporarily unavailable",
+    "observed": null
   },
   "tides": [
     {
