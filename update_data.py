@@ -11,14 +11,14 @@ from zoneinfo import ZoneInfo
 
 PACIFIC = ZoneInfo("America/Los_Angeles")
 
-# Approximate ocean point immediately offshore of Campus Point.
+# Approximate ocean location just offshore of Campus Point
 CAMPUS_LAT = 34.39
 CAMPUS_LON = -119.85
 
-# Confirmed Campus Point YouTube stream.
+# Campus Point live YouTube camera
 CAMERA_ID = "sVENjHlL4Pk"
 
-# NASA/JPL MUR sea-surface-temperature dataset via NOAA CoastWatch.
+# NASA/JPL MUR satellite sea-surface-temperature dataset
 SATELLITE_URL = (
     "https://coastwatch.pfeg.noaa.gov/erddap/"
     "griddap/jplMURSST41.json"
@@ -26,7 +26,7 @@ SATELLITE_URL = (
 
 
 # =========================================================
-# BASIC DOWNLOAD FUNCTIONS
+# DOWNLOAD HELPERS
 # =========================================================
 
 def download_text(url):
@@ -34,7 +34,7 @@ def download_text(url):
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "S17-Surf/3.0"
+            "User-Agent": "S17-Surf/4.0"
         }
     )
 
@@ -118,6 +118,7 @@ def buoy_rows(station):
     lines = download_text(url).splitlines()
 
     if len(lines) < 3:
+
         raise RuntimeError(
             f"No data available from buoy {station}"
         )
@@ -156,6 +157,7 @@ def buoy_rows(station):
             KeyError,
             ValueError
         ):
+
             continue
 
         row["_observed"] = observed
@@ -199,7 +201,7 @@ def latest_value(
 
 
 # =========================================================
-# WAVE BUOY
+# WAVE BUOY DATA
 # =========================================================
 
 def wave_buoy(
@@ -224,12 +226,6 @@ def wave_buoy(
         "MWD"
     )
 
-    water_c = latest_value(
-        rows,
-        "WTMP",
-        max_age_hours=24
-    )
-
     return {
 
         "station":
@@ -247,12 +243,7 @@ def wave_buoy(
             period,
 
         "direction_deg":
-            direction,
-
-        "water_temp_f":
-            celsius_to_fahrenheit(
-                water_c
-            )
+            direction
     }
 
 
@@ -280,6 +271,10 @@ def satellite_water_temperature():
         + encoded_query
     )
 
+    print(
+        "Requesting NASA MUR satellite SST..."
+    )
+
     result = download_json(url)
 
     table = result.get(
@@ -300,7 +295,7 @@ def satellite_water_temperature():
     if not rows:
 
         raise RuntimeError(
-            "No NASA MUR temperature returned"
+            "NASA MUR returned no temperature data"
         )
 
     for row in rows:
@@ -321,7 +316,7 @@ def satellite_water_temperature():
         if temp_c is None:
             continue
 
-        # Reject physically unrealistic values.
+        # Reject impossible SST values
         if not -2 <= temp_c <= 40:
             continue
 
@@ -329,43 +324,17 @@ def satellite_water_temperature():
             observation.get("time")
         )
 
-        # Some ERDDAP responses may not include
-        # time in the returned columns.
-        observed_display = (
-            observation_time
-            if observation_time
-            else "latest available"
+        temp_f = (
+            celsius_to_fahrenheit(
+                temp_c
+            )
         )
 
-        if observation_time:
-
-            try:
-
-                observed = (
-                    datetime.fromisoformat(
-                        observation_time.replace(
-                            "Z",
-                            "+00:00"
-                        )
-                    )
-                )
-
-                age_hours = (
-                    datetime.now(timezone.utc)
-                    - observed
-                ).total_seconds() / 3600
-
-                # MUR is a daily product, so allow
-                # several days for processing delays.
-                if age_hours > 120:
-
-                    raise RuntimeError(
-                        "NASA MUR temperature is too old"
-                    )
-
-            except ValueError:
-
-                pass
+        print(
+            "NASA MUR SATELLITE SST SUCCESS:",
+            temp_f,
+            "F"
+        )
 
         return {
 
@@ -373,80 +342,40 @@ def satellite_water_temperature():
                 "NASA MUR",
 
             "temp_f":
-                celsius_to_fahrenheit(
-                    temp_c
-                ),
-
-            "source":
-                "NASA MUR satellite SST near Campus Point",
-
-            "observed":
-                observed_display
-        }
-
-    raise RuntimeError(
-        "No valid NASA MUR temperature"
-    )
-
-
-# =========================================================
-# BACKUP BUOY WATER TEMPERATURE
-# =========================================================
-
-def backup_water_temperature(
-    channel,
-    harvest
-):
-
-    # First choice:
-    # East Santa Barbara buoy.
-
-    for buoy in [
-        channel,
-        harvest
-    ]:
-
-        if not buoy:
-            continue
-
-        temp_f = buoy.get(
-            "water_temp_f"
-        )
-
-        if temp_f is None:
-            continue
-
-        return {
-
-            "station":
-                buoy["station"],
-
-            "temp_f":
                 temp_f,
 
             "source":
                 (
-                    "NOAA buoy "
-                    + buoy["station"]
-                    + " — "
-                    + buoy["name"]
+                    "NASA MUR satellite SST "
+                    "near Campus Point"
+                ),
+
+            "observed":
+                (
+                    observation_time
+                    if observation_time
+                    else "latest available"
                 )
         }
 
-    return None
+    raise RuntimeError(
+        "NASA MUR returned no valid SST value"
+    )
 
 
 # =========================================================
-# CHOOSE WATER TEMPERATURE
+# WATER TEMPERATURE
 # =========================================================
 
-def water_temperature(
-    channel,
-    harvest
-):
+def water_temperature():
 
-    # PRIMARY:
-    # NASA satellite SST.
+    """
+    Water temperature displayed on the S17 card
+    comes ONLY from NASA/JPL MUR satellite SST.
+
+    A buoy temperature is deliberately NOT used
+    as a fallback.
+    """
 
     try:
 
@@ -461,49 +390,32 @@ def water_temperature(
             ) is not None
         ):
 
-            print(
-                "Using NASA MUR water temperature:",
-                satellite["temp_f"],
-                "F"
-            )
-
             return satellite
 
     except Exception as error:
 
         print(
-            "NASA MUR temperature error:",
+            "NASA MUR SATELLITE ERROR:",
             error
         )
 
-    # BACKUP:
-    # Actual buoy thermometer.
-
-    backup = backup_water_temperature(
-        channel,
-        harvest
-    )
-
-    if backup:
-
-        print(
-            "Using backup buoy water temperature:",
-            backup["temp_f"],
-            "F"
-        )
-
-        return backup
-
+    # Do NOT substitute Harvest or another buoy.
     return {
 
         "station":
-            None,
+            "NASA MUR",
 
         "temp_f":
             None,
 
         "source":
-            "Water temperature unavailable"
+            (
+                "NASA MUR satellite SST "
+                "temporarily unavailable"
+            ),
+
+        "observed":
+            None
     }
 
 
@@ -517,120 +429,180 @@ def estimate_campus_surf(
 ):
 
     """
-    Experimental estimate only.
+    Experimental Campus Point breaking-wave estimate.
 
-    This is NOT a measured Campus Point wave height
-    and NOT a calibrated numerical surf model.
+    Harvest 46218 is the primary swell source.
 
-    The East Santa Barbara buoy provides the
-    in-channel wave-energy reference.
+    East Santa Barbara 46053 is used as an
+    additional reference only when it actually
+    has valid wave-height data.
 
-    Harvest provides information about incoming
-    swell direction and period.
+    This is not a measured Campus Point wave height.
     """
 
-    if not harvest or not channel:
+    # Harvest is required.
+    # East Santa Barbara is NOT required.
+
+    if not harvest:
         return None
 
-    channel_height = channel.get(
+    harvest_height = harvest.get(
         "wave_height_ft"
     )
 
-    harvest_period = harvest.get(
+    period = harvest.get(
         "period_sec"
     )
 
-    harvest_direction = harvest.get(
+    direction = harvest.get(
         "direction_deg"
     )
 
     if (
-        channel_height is None
-        or harvest_period is None
-        or harvest_direction is None
+        harvest_height is None
+        or period is None
+        or direction is None
     ):
+
         return None
 
 
-    # -----------------------------------------
-    # DIRECTION FACTOR
-    # -----------------------------------------
+    # =====================================================
+    # CAMPUS POINT DIRECTIONAL EXPOSURE
+    # =====================================================
+    #
+    # Campus Point is protected from steep NW swell.
+    # More westerly swell has better exposure.
+    #
+    # These factors are experimental and can later
+    # be calibrated against the Campus Point camera.
+    # =====================================================
 
-    # More westerly swell generally has better
-    # opportunity to enter the Santa Barbara
-    # Channel than steep NW swell.
+    if 255 <= direction <= 280:
 
-    if 250 <= harvest_direction <= 285:
+        exposure = 0.42
 
-        direction_factor = 1.00
+    elif 245 <= direction < 255:
 
-    elif 235 <= harvest_direction < 250:
+        exposure = 0.34
 
-        direction_factor = 0.85
+    elif 280 < direction <= 290:
 
-    elif 285 < harvest_direction <= 300:
+        exposure = 0.32
 
-        direction_factor = 0.75
+    elif 235 <= direction < 245:
 
-    elif 220 <= harvest_direction < 235:
+        exposure = 0.25
 
-        direction_factor = 0.65
+    elif 290 < direction <= 300:
 
-    elif 300 < harvest_direction <= 315:
+        exposure = 0.22
 
-        direction_factor = 0.55
+    elif 225 <= direction < 235:
 
-    else:
+        exposure = 0.18
 
-        direction_factor = 0.45
+    elif 300 < direction <= 310:
 
+        exposure = 0.15
 
-    # -----------------------------------------
-    # PERIOD FACTOR
-    # -----------------------------------------
+    elif 310 < direction <= 320:
 
-    # Longer-period swell carries more energy
-    # and refracts differently around coastal
-    # features.
+        exposure = 0.11
 
-    if harvest_period >= 17:
+    elif 320 < direction <= 330:
 
-        period_factor = 1.20
+        exposure = 0.08
 
-    elif harvest_period >= 14:
+    elif 330 < direction <= 340:
 
-        period_factor = 1.10
-
-    elif harvest_period >= 11:
-
-        period_factor = 1.00
-
-    elif harvest_period >= 8:
-
-        period_factor = 0.85
+        exposure = 0.06
 
     else:
 
-        period_factor = 0.70
+        exposure = 0.05
 
 
-    center = (
-        channel_height
-        * direction_factor
+    # =====================================================
+    # PERIOD / ENERGY ADJUSTMENT
+    # =====================================================
+
+    if period >= 18:
+
+        period_factor = 1.35
+
+    elif period >= 16:
+
+        period_factor = 1.25
+
+    elif period >= 14:
+
+        period_factor = 1.15
+
+    elif period >= 12:
+
+        period_factor = 1.05
+
+    elif period >= 10:
+
+        period_factor = 0.95
+
+    elif period >= 8:
+
+        period_factor = 0.80
+
+    else:
+
+        period_factor = 0.65
+
+
+    # =====================================================
+    # HARVEST-BASED ESTIMATE
+    # =====================================================
+
+    estimated = (
+        harvest_height
+        * exposure
         * period_factor
     )
 
 
-    # -----------------------------------------
-    # CREATE A RANGE
-    # -----------------------------------------
+    # =====================================================
+    # OPTIONAL EAST SANTA BARBARA ADJUSTMENT
+    # =====================================================
+
+    channel_height = None
+
+    if channel:
+
+        channel_height = channel.get(
+            "wave_height_ft"
+        )
+
+
+    # If East Santa Barbara has real wave data,
+    # use it as additional information.
+    #
+    # If it is null, Harvest continues by itself.
+
+    if channel_height is not None:
+
+        estimated = (
+            estimated * 0.65
+            + channel_height * 0.35
+        )
+
+
+    # =====================================================
+    # CONVERT ESTIMATE INTO DISPLAY RANGE
+    # =====================================================
 
     low = round(
-        center * 0.65 * 2
+        estimated * 0.75 * 2
     ) / 2
 
     high = round(
-        center * 1.35 * 2
+        estimated * 1.35 * 2
     ) / 2
 
     low = max(
@@ -653,7 +625,25 @@ def estimate_campus_surf(
             high,
 
         "method":
-            "Harvest + East Santa Barbara",
+            (
+                "Harvest swell adjusted for "
+                "Campus Point exposure"
+            ),
+
+        "inputs": {
+
+            "harvest_height_ft":
+                harvest_height,
+
+            "period_sec":
+                period,
+
+            "direction_deg":
+                direction,
+
+            "channel_height_ft":
+                channel_height
+        },
 
         "disclaimer":
             (
@@ -758,7 +748,7 @@ def tide_data(today):
 
 
 # =========================================================
-# MAIN UPDATE
+# MAIN
 # =========================================================
 
 def main():
@@ -808,9 +798,9 @@ def main():
     }
 
 
-    # -----------------------------------------
-    # HARVEST 46218
-    # -----------------------------------------
+    # =====================================================
+    # HARVEST BUOY 46218
+    # =====================================================
 
     try:
 
@@ -827,9 +817,9 @@ def main():
         )
 
 
-    # -----------------------------------------
-    # EAST SANTA BARBARA 46053
-    # -----------------------------------------
+    # =====================================================
+    # EAST SANTA BARBARA BUOY 46053
+    # =====================================================
 
     try:
 
@@ -846,21 +836,18 @@ def main():
         )
 
 
-    # -----------------------------------------
-    # WATER TEMPERATURE
-    # -----------------------------------------
+    # =====================================================
+    # NASA SATELLITE WATER TEMPERATURE
+    # =====================================================
 
     data["water_temp"] = (
-        water_temperature(
-            data["channel"],
-            data["harvest"]
-        )
+        water_temperature()
     )
 
 
-    # -----------------------------------------
+    # =====================================================
     # CAMPUS POINT SURF ESTIMATE
-    # -----------------------------------------
+    # =====================================================
 
     data["surf_estimate"] = (
         estimate_campus_surf(
@@ -870,9 +857,9 @@ def main():
     )
 
 
-    # -----------------------------------------
+    # =====================================================
     # TIDES
-    # -----------------------------------------
+    # =====================================================
 
     try:
 
@@ -888,9 +875,9 @@ def main():
         )
 
 
-    # -----------------------------------------
+    # =====================================================
     # SAVE DATA.JSON
-    # -----------------------------------------
+    # =====================================================
 
     with open(
         "data.json",
