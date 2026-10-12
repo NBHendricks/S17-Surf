@@ -160,23 +160,36 @@ def harvest_data():
 # ----------------------------------------
 # CAMPUS POINT AREA WATER TEMPERATURE
 # ----------------------------------------
-
 def water_temperature():
 
-    rows = buoy_rows("46053")
+    for station in ["46053", "46251"]:
 
-    water_c = latest_value(
-        rows,
-        "WTMP",
-        max_age_hours=12
-    )
+        try:
+            rows = buoy_rows(station)
+
+            water_c = latest_value(
+                rows,
+                "WTMP",
+                max_age_hours=24
+            )
+
+            if water_c is not None:
+
+                return {
+                    "station": station,
+                    "temp_f": fahrenheit(water_c)
+                }
+
+        except Exception as error:
+            print(
+                f"Water temperature error at {station}:",
+                error
+            )
 
     return {
-        "station": "46053",
-        "temp_f": fahrenheit(water_c)
+        "station": None,
+        "temp_f": None
     }
-
-
 # ----------------------------------------
 # SANTA BARBARA TIDES
 # ----------------------------------------
