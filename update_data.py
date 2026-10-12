@@ -3,19 +3,23 @@ import os
 import urllib.request
 import urllib.parse
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 
 PACIFIC = ZoneInfo("America/Los_Angeles")
 
 
+# ----------------------------------------
+# DOWNLOAD INFORMATION
+# ----------------------------------------
+
 def download_text(url):
 
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "S17-Surf/1.0"
+            "User-Agent": "S17-Surf/1.0 (surf dashboard)"
         }
     )
 
@@ -30,27 +34,27 @@ def download_text(url):
         )
 
 
-def parse_ndbc(station):
+def download_json(url):
+
+    return json.loads(download_text(url))
+
+
+# ----------------------------------------
+# READ NOAA BUOY
+# ----------------------------------------
+
+def buoy_rows(station):
 
     url = (
         "https://www.ndbc.noaa.gov/"
         f"data/realtime2/{station}.txt"
     )
 
-    text = download_text(url)
-
-    lines = [
-        line.strip()
-        for line in text.splitlines()
-        if line.strip()
-    ]
-
-    if len(lines) < 3:
-        raise RuntimeError(
-            f"No observations for {station}"
-        )
+    lines = download_text(url).splitlines()
 
     headers = lines[0].lstrip("#").split()
+
+    rows = []
 
     for line in lines[2:]:
 
@@ -59,13 +63,25 @@ def parse_ndbc(station):
         if len(values) < len(headers):
             continue
 
-        return dict(
-            zip(headers, values)
-        )
+        row = dict(zip(headers, values))
 
-    raise RuntimeError(
-        f"No valid row for {station}"
-    )
+        try:
+            observed = datetime(
+                int(row["YY"]),
+                int(row["MM"]),
+                int(row["DD"]),
+                int(row["hh"]),
+                int(row["mm"]),
+                tzinfo=timezone.utc
+            )
+        except (KeyError, ValueError):
+            continue
+
+        row["_observed"] = observed
+
+        rows.append(row)
+
+    return rows
 
 
 def number(value):
@@ -74,80 +90,100 @@ def number(value):
         return None
 
     if value in {
-        "MM",
-        "999",
-        "999.0",
-        "99.0",
-        "9999"
+        "MM", "999", "999.0",
+        "99.0", "9999", "9999.0"
     }:
         return None
 
     try:
         return float(value)
-
-    except ValueError:
+    except (ValueError, TypeError):
         return None
 
 
+def latest_value(rows, field, max_age_hours=6):
+
+    cutoff = (
+        datetime.now(timezone.utc)
+        - timedelta(hours=max_age_hours)
+    )
+
+    for row in rows:
+
+        if row["_observed"] < cutoff:
+            continue
+
+        value = number(row.get(field))
+
+        if value is not None:
+            return value
+
+    return None
+
+
+def feet(meters):
+
+    if meters is None:
+        return None
+
+    return round(meters * 3.28084, 1)
+
+
+def fahrenheit(celsius):
+
+    if celsius is None:
+        return None
+
+    return round(celsius * 9 / 5 + 32, 1)
+
+
+# ----------------------------------------
+# HARVEST BUOY
+# ----------------------------------------
+
 def harvest_data():
 
-    row = parse_ndbc("46218")
+    rows = buoy_rows("46218")
 
-    wave_m = number(
-        row.get("WVHT")
-    )
-
-    period = number(
-        row.get("DPD")
-    )
-
-    direction = number(
-        row.get("MWD")
-    )
+    wave = latest_value(rows, "WVHT")
+    period = latest_value(rows, "DPD")
+    direction = latest_value(rows, "MWD")
 
     return {
-        "wave_height_ft":
-            round(
-                wave_m * 3.28084,
-                1
-            )
-            if wave_m is not None
-            else None,
-
-        "period_sec":
-            period,
-
-        "direction_deg":
-            direction
+        "station": "46218",
+        "wave_height_ft": feet(wave),
+        "period_sec": period,
+        "direction_deg": direction
     }
 
 
-def campus_water_temp():
+# ----------------------------------------
+# CAMPUS POINT AREA WATER TEMPERATURE
+# ----------------------------------------
 
-    row = parse_ndbc("46053")
+def water_temperature():
 
-    water_c = number(
-        row.get("WTMP")
+    rows = buoy_rows("46053")
+
+    water_c = latest_value(
+        rows,
+        "WTMP",
+        max_age_hours=12
     )
 
     return {
         "station": "46053",
-
-        "temp_f":
-            round(
-                water_c * 9 / 5 + 32,
-                1
-            )
-            if water_c is not None
-            else None
+        "temp_f": fahrenheit(water_c)
     }
 
 
+# ----------------------------------------
+# SANTA BARBARA TIDES
+# ----------------------------------------
+
 def tide_data(today):
 
-    date_string = today.strftime(
-        "%Y%m%d"
-    )
+    date_string = today.strftime("%Y%m%d")
 
     params = {
         "product": "predictions",
@@ -168,53 +204,40 @@ def tide_data(today):
         + urllib.parse.urlencode(params)
     )
 
-    result = json.loads(
-        download_text(url)
-    )
-
-    predictions = result.get(
-        "predictions",
-        []
-    )
+    result = download_json(url)
 
     tides = []
 
-    for tide in predictions:
+    for item in result.get("predictions", []):
 
         timestamp = datetime.strptime(
-            tide["t"],
+            item["t"],
             "%Y-%m-%d %H:%M"
         )
 
         tides.append({
-            "type":
+            "type": (
                 "HIGH"
-                if tide["type"] == "H"
-                else "LOW",
-
-            "time":
-                timestamp.strftime(
-                    "%-I:%M %p"
-                ),
-
-            "height_ft":
-                round(
-                    float(tide["v"]),
-                    1
-                )
+                if item["type"] == "H"
+                else "LOW"
+            ),
+            "time": timestamp.strftime("%-I:%M %p"),
+            "height_ft": round(float(item["v"]), 1)
         })
 
     return tides
 
 
+# ----------------------------------------
+# LIVE CAMPUS POINT YOUTUBE CAMERA
+# ----------------------------------------
+
 def campus_live_cam():
 
-    api_key = os.environ.get(
-        "YOUTUBE_API_KEY"
-    )
+    api_key = os.environ.get("YOUTUBE_API_KEY")
 
     if not api_key:
-        print("No YouTube API key available")
+        print("YouTube API key not configured")
         return None
 
     params = {
@@ -222,8 +245,8 @@ def campus_live_cam():
         "q": "Campus Point Surf Cam GRIT",
         "type": "video",
         "eventType": "live",
-        "maxResults": "5",
         "videoEmbeddable": "true",
+        "maxResults": "10",
         "key": api_key
     }
 
@@ -233,97 +256,54 @@ def campus_live_cam():
         + urllib.parse.urlencode(params)
     )
 
-    data = json.loads(
-        download_text(url)
-    )
+    result = download_json(url)
 
-    items = data.get(
-        "items",
-        []
-    )
+    for item in result.get("items", []):
 
-    for item in items:
+        snippet = item.get("snippet", {})
 
-        snippet = item.get(
-            "snippet",
-            {}
-        )
-
-        title = snippet.get(
-            "title",
-            ""
-        ).lower()
+        title = snippet.get("title", "").lower()
 
         channel = snippet.get(
-            "channelTitle",
-            ""
+            "channelTitle", ""
         ).lower()
 
-        video_id = (
-            item
-            .get("id", {})
-            .get("videoId")
-        )
+        video_id = item.get(
+            "id", {}
+        ).get("videoId")
 
         if (
             video_id
-            and
-            "campus point" in title
-            and
-            "grit" in channel
+            and "campus point" in title
+            and "grit" in channel
         ):
 
             return {
                 "video_id": video_id,
                 "title": snippet.get("title"),
-                "channel": snippet.get(
-                    "channelTitle"
-                )
+                "channel": snippet.get("channelTitle")
             }
 
-    for item in items:
-
-        video_id = (
-            item
-            .get("id", {})
-            .get("videoId")
-        )
-
-        if video_id:
-
-            snippet = item.get(
-                "snippet",
-                {}
-            )
-
-            return {
-                "video_id": video_id,
-                "title": snippet.get("title"),
-                "channel": snippet.get(
-                    "channelTitle"
-                )
-            }
+    print("No matching live Campus Point stream found")
 
     return None
 
 
+# ----------------------------------------
+# MAIN UPDATE
+# ----------------------------------------
+
 def main():
 
-    now = datetime.now(
-        PACIFIC
-    )
+    now = datetime.now(PACIFIC)
 
     data = {
-        "date_display":
-            now.strftime(
-                "%A, %B %-d, %Y"
-            ),
-
-        "updated_display":
-            now.strftime(
-                "%-I:%M %p %Z"
-            ),
-
+        "date_display": now.strftime(
+            "%A, %B %-d, %Y"
+        ),
+        "updated_display": now.strftime(
+            "%-I:%M %p %Z"
+        ),
         "harvest": None,
         "water_temp": None,
         "tides": [],
@@ -331,48 +311,24 @@ def main():
     }
 
     try:
-        data["harvest"] = (
-            harvest_data()
-        )
-
+        data["harvest"] = harvest_data()
     except Exception as error:
-        print(
-            "Harvest error:",
-            error
-        )
+        print("Harvest error:", error)
 
     try:
-        data["water_temp"] = (
-            campus_water_temp()
-        )
-
+        data["water_temp"] = water_temperature()
     except Exception as error:
-        print(
-            "Water temp error:",
-            error
-        )
+        print("Water temperature error:", error)
 
     try:
-        data["tides"] = (
-            tide_data(now)
-        )
-
+        data["tides"] = tide_data(now)
     except Exception as error:
-        print(
-            "Tide error:",
-            error
-        )
+        print("Tides error:", error)
 
     try:
-        data["campus_cam"] = (
-            campus_live_cam()
-        )
-
+        data["campus_cam"] = campus_live_cam()
     except Exception as error:
-        print(
-            "Campus cam error:",
-            error
-        )
+        print("YouTube camera error:", error)
 
     with open(
         "data.json",
@@ -380,18 +336,9 @@ def main():
         encoding="utf-8"
     ) as file:
 
-        json.dump(
-            data,
-            file,
-            indent=2
-        )
+        json.dump(data, file, indent=2)
 
-    print(
-        json.dumps(
-            data,
-            indent=2
-        )
-    )
+    print(json.dumps(data, indent=2))
 
 
 if __name__ == "__main__":
