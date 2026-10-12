@@ -1,6 +1,6 @@
 {
   "date_display": "Sunday, October 11, 2026",
-  "updated_display": "10:25 PM PDT",
+  "updated_display": "10:30 PM PDT",
   "harvest": {
     "station": "46218",
     "wave_height_ft": 10.5,
@@ -8,8 +8,10 @@
     "direction_deg": 327.0
   },
   "water_temp": {
-    "station": null,
-    "temp_f": null
+    "station": "NASA MUR",
+    "temp_f": 71.4,
+    "source": "NASA satellite estimate",
+    "observed": "2026-10-10T09:00:00Z"
   },
   "tides": [
     {
@@ -33,5 +35,8 @@
       "height_ft": 4.2
     }
   ],
-  "campus_cam": null
+  "campus_cam": {
+    "video_id": "sVENjHlL4Pk",
+    "title": "Campus Point Surf Cam"
+  }
 }
