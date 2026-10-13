@@ -1,13 +1,13 @@
 {
   "location": "Campus Point, California",
-  "date_display": "Monday, October 12, 2026",
-  "updated_display": "7:13 PM PDT",
+  "date_display": "Tuesday, October 13, 2026",
+  "updated_display": "2:42 AM PDT",
   "harvest": {
     "station": "46218",
     "name": "Harvest",
-    "wave_height_ft": 10.2,
-    "period_sec": 18.0,
-    "direction_deg": 290.0
+    "wave_height_ft": 8.5,
+    "period_sec": 11.0,
+    "direction_deg": 334.0
   },
   "channel": {
     "station": "46053",
@@ -17,38 +17,43 @@
     "direction_deg": null
   },
   "surf_estimate": {
-    "low_ft": 3.5,
-    "high_ft": 6.0,
+    "low_ft": 0.5,
+    "high_ft": 1.0,
     "method": "Harvest swell adjusted for Campus Point exposure",
     "inputs": {
-      "harvest_height_ft": 10.2,
-      "period_sec": 18.0,
-      "direction_deg": 290.0,
+      "harvest_height_ft": 8.5,
+      "period_sec": 11.0,
+      "direction_deg": 334.0,
       "channel_height_ft": null
     },
     "disclaimer": "Experimental estimate only. Not a measured or validated Campus Point breaking-wave height."
   },
   "water_temp": {
     "station": "NASA MUR",
-    "temp_f": 70.5,
-    "source": "NASA MUR satellite SST near Campus Point",
-    "observed": "2026-10-11T09:00:00Z"
+    "temp_f": null,
+    "source": "NASA MUR satellite SST temporarily unavailable",
+    "observed": null
   },
   "tides": [
     {
+      "type": "HIGH",
+      "time": "12:02 AM",
+      "height_ft": 3.9
+    },
+    {
       "type": "LOW",
-      "time": "4:20 AM",
-      "height_ft": 2.0
+      "time": "4:42 AM",
+      "height_ft": 2.4
     },
     {
       "type": "HIGH",
-      "time": "10:37 AM",
-      "height_ft": 5.9
+      "time": "11:03 AM",
+      "height_ft": 5.7
     },
     {
       "type": "LOW",
-      "time": "5:41 PM",
-      "height_ft": 0.1
+      "time": "6:25 PM",
+      "height_ft": 0.3
     }
   ],
   "campus_cam": {
