@@ -1,59 +1,54 @@
 {
   "location": "Campus Point, California",
-  "date_display": "Sunday, October 18, 2026",
-  "updated_display": "10:14 PM PDT",
+  "date_display": "Monday, October 19, 2026",
+  "updated_display": "4:11 AM PDT",
   "harvest": {
     "station": "46218",
     "name": "Harvest",
-    "wave_height_ft": 7.2,
-    "period_sec": 12.0,
-    "direction_deg": 295.0
+    "wave_height_ft": 7.9,
+    "period_sec": 13.0,
+    "direction_deg": 300.0
   },
   "channel": {
     "station": "46053",
     "name": "East Santa Barbara",
-    "wave_height_ft": 3.3,
-    "period_sec": 12.0,
-    "direction_deg": 269.0
+    "wave_height_ft": 3.9,
+    "period_sec": 11.0,
+    "direction_deg": 267.0
   },
   "surf_estimate": {
-    "low_ft": 1.5,
-    "high_ft": 3.0,
+    "low_ft": 2.0,
+    "high_ft": 3.5,
     "method": "Harvest swell adjusted for Campus Point exposure",
     "inputs": {
-      "harvest_height_ft": 7.2,
-      "period_sec": 12.0,
-      "direction_deg": 295.0,
-      "channel_height_ft": 3.3
+      "harvest_height_ft": 7.9,
+      "period_sec": 13.0,
+      "direction_deg": 300.0,
+      "channel_height_ft": 3.9
     },
     "disclaimer": "Experimental estimate only. Not a measured or validated Campus Point breaking-wave height."
   },
   "water_temp": {
     "station": "NASA MUR",
-    "temp_f": null,
-    "source": "NASA MUR satellite SST temporarily unavailable",
-    "observed": null
+    "temp_f": 70.3,
+    "source": "NASA MUR satellite SST near Campus Point",
+    "observed": "2026-10-17T09:00:00Z"
   },
   "tides": [
     {
       "type": "HIGH",
-      "time": "7:15 AM",
-      "height_ft": 3.8
+      "time": "7:17 AM",
+      "height_ft": 4.0
     },
     {
       "type": "LOW",
-      "time": "10:26 AM",
-      "height_ft": 3.6
+      "time": "11:58 AM",
+      "height_ft": 3.2
     },
     {
       "type": "HIGH",
-      "time": "3:47 PM",
+      "time": "5:14 PM",
       "height_ft": 4.3
-    },
-    {
-      "type": "LOW",
-      "time": "11:50 PM",
-      "height_ft": 0.8
     }
   ],
   "campus_cam": {
