@@ -1,29 +1,29 @@
 {
   "location": "Campus Point, California",
-  "date_display": "Thursday, October 22, 2026",
-  "updated_display": "6:53 PM PDT",
+  "date_display": "Friday, October 23, 2026",
+  "updated_display": "12:22 AM PDT",
   "harvest": {
     "station": "46218",
     "name": "Harvest",
-    "wave_height_ft": 6.2,
-    "period_sec": 14.0,
-    "direction_deg": 188.0
+    "wave_height_ft": 5.6,
+    "period_sec": 13.0,
+    "direction_deg": 177.0
   },
   "channel": {
     "station": "46053",
     "name": "East Santa Barbara",
     "wave_height_ft": 2.6,
-    "period_sec": 11.0,
-    "direction_deg": 267.0
+    "period_sec": 6.0,
+    "direction_deg": 258.0
   },
   "surf_estimate": {
     "low_ft": 1.0,
     "high_ft": 1.5,
     "method": "Harvest swell adjusted for Campus Point exposure",
     "inputs": {
-      "harvest_height_ft": 6.2,
-      "period_sec": 14.0,
-      "direction_deg": 188.0,
+      "harvest_height_ft": 5.6,
+      "period_sec": 13.0,
+      "direction_deg": 177.0,
       "channel_height_ft": 2.6
     },
     "disclaimer": "Experimental estimate only. Not a measured or validated Campus Point breaking-wave height."
@@ -37,23 +37,23 @@
   "tides": [
     {
       "type": "LOW",
-      "time": "1:33 AM",
-      "height_ft": 0.7
+      "time": "1:59 AM",
+      "height_ft": 0.8
     },
     {
       "type": "HIGH",
-      "time": "7:59 AM",
-      "height_ft": 4.9
+      "time": "8:19 AM",
+      "height_ft": 5.3
     },
     {
       "type": "LOW",
-      "time": "2:00 PM",
-      "height_ft": 1.5
+      "time": "2:37 PM",
+      "height_ft": 0.9
     },
     {
       "type": "HIGH",
-      "time": "7:53 PM",
-      "height_ft": 4.7
+      "time": "8:38 PM",
+      "height_ft": 4.6
     }
   ],
   "campus_cam": {
