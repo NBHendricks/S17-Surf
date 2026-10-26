@@ -1,59 +1,59 @@
 {
   "location": "Campus Point, California",
-  "date_display": "Sunday, October 25, 2026",
-  "updated_display": "6:37 PM PDT",
+  "date_display": "Monday, October 26, 2026",
+  "updated_display": "12:43 AM PDT",
   "harvest": {
     "station": "46218",
     "name": "Harvest",
-    "wave_height_ft": 3.6,
-    "period_sec": 15.0,
-    "direction_deg": 188.0
+    "wave_height_ft": 3.9,
+    "period_sec": 14.0,
+    "direction_deg": 198.0
   },
   "channel": {
     "station": "46053",
     "name": "East Santa Barbara",
-    "wave_height_ft": 2.3,
-    "period_sec": 9.0,
-    "direction_deg": 260.0
+    "wave_height_ft": 2.0,
+    "period_sec": 4.0,
+    "direction_deg": 253.0
   },
   "surf_estimate": {
     "low_ft": 0.5,
-    "high_ft": 1.5,
+    "high_ft": 1.0,
     "method": "Harvest swell adjusted for Campus Point exposure",
     "inputs": {
-      "harvest_height_ft": 3.6,
-      "period_sec": 15.0,
-      "direction_deg": 188.0,
-      "channel_height_ft": 2.3
+      "harvest_height_ft": 3.9,
+      "period_sec": 14.0,
+      "direction_deg": 198.0,
+      "channel_height_ft": 2.0
     },
     "disclaimer": "Experimental estimate only. Not a measured or validated Campus Point breaking-wave height."
   },
   "water_temp": {
     "station": "NASA MUR",
-    "temp_f": null,
-    "source": "NASA MUR satellite SST temporarily unavailable",
-    "observed": null
+    "temp_f": 70.7,
+    "source": "NASA MUR satellite SST near Campus Point",
+    "observed": "2026-10-24T09:00:00Z"
   },
   "tides": [
     {
       "type": "LOW",
-      "time": "2:54 AM",
-      "height_ft": 1.3
+      "time": "3:23 AM",
+      "height_ft": 1.7
     },
     {
       "type": "HIGH",
-      "time": "9:09 AM",
-      "height_ft": 6.2
+      "time": "9:39 AM",
+      "height_ft": 6.5
     },
     {
       "type": "LOW",
-      "time": "3:56 PM",
-      "height_ft": -0.3
+      "time": "4:41 PM",
+      "height_ft": -0.6
     },
     {
       "type": "HIGH",
-      "time": "10:11 PM",
-      "height_ft": 4.4
+      "time": "11:03 PM",
+      "height_ft": 4.2
     }
   ],
   "campus_cam": {
